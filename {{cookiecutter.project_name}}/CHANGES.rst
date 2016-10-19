@@ -1,4 +1,4 @@
-Changelog of {{ cookiecutter.project_name }}
+Changelog of {{ cookiecutter.project_slug }}
 ===================================================
 
 
