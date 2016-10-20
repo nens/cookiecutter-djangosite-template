@@ -3,3 +3,4 @@ bin/
 cookiecutter_djangosite_template.egg-info/
 develop-eggs/
 parts/
+*.pyc
