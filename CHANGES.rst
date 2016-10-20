@@ -5,3 +5,5 @@ Changelog for cookiecutter-djangosite-template
 ----------------
 
 - Started project.
+
+- Got first version of the template to work.

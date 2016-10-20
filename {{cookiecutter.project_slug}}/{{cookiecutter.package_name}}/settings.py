@@ -154,8 +154,7 @@ STATIC_ROOT = os.path.join(BUILDOUT_DIR, 'var', 'static')
 # trailing slash if there is a path component (optional in other cases).
 MEDIA_URL = '/media/'
 # URL for the per-application /media static files collected by
-# django-staticfiles.  Use it in templates like
-# "{{ MEDIA_URL }}mypackage/my.css".
+# django-staticfiles.
 STATIC_URL = '/static_media/'
 
 STATICFILES_DIRS = [
