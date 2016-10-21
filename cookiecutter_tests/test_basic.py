@@ -21,7 +21,7 @@ class BasicTest(TestCase):
         }
 
     def tearDown(self):
-        rmtree(self.temp_dir)
+        rmtree(self.temp_dir, ignore_errors=True)
         os.chdir(self.our_dir)
 
     def test_smoke(self):
