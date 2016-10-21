@@ -27,3 +27,5 @@ class BasicTest(TestCase):
         cookiecutter(self.our_dir,
                      no_input=True,
                      extra_context=self.defaults)
+        self.assertIn('README.rst',
+                      os.listdir(self.temp_dir + '/world-domination'))
