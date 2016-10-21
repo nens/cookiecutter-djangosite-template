@@ -1,4 +1,4 @@
-# (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.rst.
+# (c) Nelen & Schuurmans.  Proprietary, see LICENSE file.
 
 from {{ cookiecutter.package_name }}.settings import *
 

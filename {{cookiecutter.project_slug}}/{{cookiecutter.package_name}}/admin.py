@@ -1,4 +1,4 @@
-# (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.rst.
+# (c) Nelen & Schuurmans.  Proprietary, see LICENSE file.
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from __future__ import print_function
