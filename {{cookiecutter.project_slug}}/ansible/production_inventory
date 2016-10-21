@@ -1,0 +1,7 @@
+[web]
+todo.your.host.name
+
+[web:vars]
+site_name={{ cookiecutter.project_slug }}.lizard.net
+checkout_name="master"
+buildout_cfg=production.cfg
