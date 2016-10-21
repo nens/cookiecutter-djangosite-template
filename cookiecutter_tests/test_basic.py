@@ -22,7 +22,9 @@ class BasicTest(TestCase):
 
     def tearDown(self):
         for possible_hardlink in ['eggs', 'downloads']:
-            hardlink = os.path.join(self.temp_dir, possible_hardlink)
+            hardlink = os.path.join(self.temp_dir,
+                                    'world-domination',
+                                    possible_hardlink)
             if os.path.exists(hardlink):
                 os.remove(hardlink)
                 # This way we don't zap the full contents of these dirs:
