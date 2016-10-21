@@ -1,0 +1,55 @@
+# Goal: do the day-to-day deployment of the site. This is done as the
+# 'buildout' user, not as root. At least, we're going to try to do it like
+# this. You need to have an ssh key configured to log in with: this is handled
+# in the provision.yml playbook.
+
+---
+- name: deploy new version of the project to the server
+  hosts: web
+  remote_user: buildout
+  tasks:
+
+    - name: checkout correct version from github
+      git:
+        accept_hostkey: yes
+        dest: /srv/{% raw %}{{ site_name }}{% endraw %}
+        repo: ssh://git@github.com/nens/{{ cookiecutter.project_slug }}.git
+        version: "{% raw %}{{ checkout_name }}{% endraw %}"
+
+    - name: symlink buildout config
+      file:
+        src: /srv/{% raw %}{{ site_name }}/{{ buildout_cfg }}{% endraw %}
+        dest: /srv/{% raw %}{{ site_name }}{% endraw %}/buildout.cfg
+        state: link
+
+    - name: bootstrap buildout (when needed)
+      shell: python3 bootstrap.py
+      args:
+        chdir: /srv/{% raw %}{{ site_name }}{% endraw %}
+        creates: /srv/{% raw %}{{ site_name }}{% endraw %}/bin/buildout
+
+    - name: run buildout (can take a while; look at buildout.log if something goes fishy)
+      shell: bin/buildout -vv > buildout.log 2>&1
+      args:
+        chdir: /srv/{% raw %}{{ site_name }}{% endraw %}
+
+    - name: Run migrate
+      action: shell bin/django migrate --noinput --fake-initial
+      args:
+        chdir: /srv/{% raw %}{{ site_name }}{% endraw %}
+
+    - name: "Shut down supervisor (note: an error message here is fine)"
+      action: shell supervisorctl -c etc/{% raw %}{{ site_name }}{% endraw %}.supervisord.conf shutdown
+      args:
+        chdir: /srv/{% raw %}{{ site_name }}{% endraw %}
+      ignore_errors: yes
+
+    - name: Wait for supervisor to actually stop
+      wait_for:
+        path: /srv/{% raw %}{{ site_name }}{% endraw %}/var/supervisord.pid
+        state: absent
+
+    - name: "Start site with supervisor"
+      action: shell supervisord -c etc/{% raw %}{{ site_name }}{% endraw %}.supervisord.conf
+      args:
+        chdir: /srv/{% raw %}{{ site_name }}{% endraw %}

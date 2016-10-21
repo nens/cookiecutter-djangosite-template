@@ -6,61 +6,58 @@ Introduction
 Usage, etc.
 
 
-Post-nensskel project setup TODO
---------------------------------
+Installation on the server
+--------------------------
 
-Here are some instructions on what to do after you've created the project with
-nensskel.
+The ansible config and playbook is in the ``ansible/``
+subdir. ``ansible/staging_inventory`` and ``ansible/production_inventory`` are
+the two inventory files. Adjust variables (like checkout name and server name)
+in there.
 
-- Fill in a short description on https://github.com/nens/PROJECT if you
-  haven't done so already.
+The ``ansible/provision.yml`` playbook does the root-level stuff like
+installing debian packages and creating a ``/srv/*`` directory. You should
+only need to run this when there's a new debian dependency, for instance. It
+also adds a couple of persons' ssh key to the ``~/.ssh/authorized_keys`` file
+of the buildout user, which the deploy script uses to log you in directly as
+user buildout.
 
-- Use the same description in the ``setup.py``'s "description" field.
+The ``ansible/deploy.yml`` playbook is for the regular releases including git
+checkout, bin/buildout, migration and supervisor restart.
 
-- Fill in your username and email address in the ``setup.py``, see the
-  ``TODO`` fields.
+General usage::
 
-- Check https://github.com/nens/PROJECT/settings/collaboration if the teams
-  "Nelen & Schuurmans" and "Nelen & Schuurmans pull only" have access.
-
-- Add a new jenkins job at
-  http://buildbot.lizardsystem.nl/jenkins/view/sites/newJob. Job name should
-  be "PROJECT", make the project a copy of the existing "wro" (for
-  instance) project. On the next page, change the "github project" to
-  ``https://github.com/nens/PROJECT/`` and
-  "repository url" fields to ``git@github.com:nens/PROJECT.git``. The rest
-  of the settings should be OK.
-
-- The project is prepared to be translated with Lizard's
-  `Transifex <http://translations.lizard.net/>`_ server. For details about
-  pushing translation files to and fetching translation files from the
-  Transifex server, see the ``nens/translations`` `documentation
-  <https://github.com/nens/translations/blob/master/README.rst>`_.
-
-Later on, before releasing the site, adjust ``fabfile.cfg`` to point at the
-correct server and configure raven/sentry and gaug.es in the django settings.
+  $ ansible-playbook --inventory ansible/staging ansible/deploy.yml
 
 
-Initial setup
---------------------------------
+Development with Docker
+-----------------------
 
-Initially, there's no ``buildout.cfg``. You need to make that a symlink to the
-correct configuration. On your development machine, that is
-``development.cfg`` (and ``staging.cfg`` or ``production.cfg``, for instance
-on the server)::
+There's a docker file to make it easy for you to get started with the project
+and to run the tests. You can edit files in the current directory and they'll
+be picked up by docker right away.
+
+The docker setup is also used by ``Jenkinsfile``, which means that our jenkins
+instance will automatically pick it up.
+
+First-time usage::
 
     $ ln -s development.cfg buildout.cfg
+    $ docker-compose build
+    $ docker-compose run --rm web python3 bootstrap.py
+    $ docker-compose run --rm web bin/buildout
+    $ docker-compose run --rm web bin/django migrate  # use '--fake-initial' if there are initial migrations
+    $ docker-compose up
 
-Then run bootstrap and buildout, as usual::
+The site will now run on http://localhost:5000
 
-    $ python bootstrap.py
-    $ bin/buildout
+Running the tests::
 
-Set up a database (and yes, set up an admin user when asked)::
+    $ docker-compose run --rm web bin/test
 
-    $ bin/django syncdb
-    $ bin/django migrate
+Note: on Linux the files generated in Docker will be owned by root. To fix this you
+can run something like this inside your project directory::
 
-Start the server::
+    $ sudo chown -R $USER:$USER .
 
-    $ bin/django runserver
+Adjust the list of ``.deb`` packages in Dockerfile if needed - and keep it in
+sync with ``ansible/provision.yml``.

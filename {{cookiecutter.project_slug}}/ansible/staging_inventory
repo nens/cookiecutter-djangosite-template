@@ -1,0 +1,7 @@
+[web]
+112-sso-d3.external-nens.local
+
+[web:vars]
+site_name={{ cookiecutter.project_slug }}.staging.lizard.net
+checkout_name="master"
+buildout_cfg=staging.cfg

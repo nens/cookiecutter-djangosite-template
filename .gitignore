@@ -4,3 +4,6 @@ cookiecutter_djangosite_template.egg-info/
 develop-eggs/
 parts/
 *.pyc
+nosetests.xml
+eggs/
+downloads/
