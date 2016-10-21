@@ -9,4 +9,4 @@ Changelog for cookiecutter-djangosite-template
 
 - Got first version of the template to work.
 
-- Added docker test setup.
+- Added docker test setup, Jenkins file and ansible integration.
