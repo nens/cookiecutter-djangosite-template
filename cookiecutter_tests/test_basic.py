@@ -10,8 +10,13 @@ import tempfile
 class BasicTest(TestCase):
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp(suffix='cookiecuttertest')
         self.our_dir = os.getcwd()
+        # The next line makes sure the temp dir is generates in our current
+        # directory instead of in /tmp. This is needed for using the egg cache
+        # on the Jenkins server. You get a "invalid cross-device link" error
+        # otherwise.
+        tempfile.tempdir = self.our_dir
+        self.temp_dir = tempfile.mkdtemp(suffix='cookiecuttertest')
         os.chdir(self.temp_dir)
         self.defaults = {
             "full_name": "Reinout van Rees",
