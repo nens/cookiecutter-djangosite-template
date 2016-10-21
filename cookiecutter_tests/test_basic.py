@@ -11,11 +11,6 @@ class BasicTest(TestCase):
 
     def setUp(self):
         self.our_dir = os.getcwd()
-        # The next line makes sure the temp dir is generates in our current
-        # directory instead of in /tmp. This is needed for using the egg cache
-        # on the Jenkins server. You get a "invalid cross-device link" error
-        # otherwise.
-        tempfile.tempdir = self.our_dir
         self.temp_dir = tempfile.mkdtemp(suffix='cookiecuttertest')
         os.chdir(self.temp_dir)
         self.defaults = {
@@ -26,14 +21,6 @@ class BasicTest(TestCase):
         }
 
     def tearDown(self):
-        for possible_hardlink in ['eggs', 'downloads']:
-            hardlink = os.path.join(self.temp_dir,
-                                    'world-domination',
-                                    possible_hardlink)
-            if os.path.exists(hardlink):
-                os.remove(hardlink)
-                # This way we don't zap the full contents of these dirs:
-                # they're meant as cache.
         rmtree(self.temp_dir)
         os.chdir(self.our_dir)
 
@@ -49,8 +36,6 @@ class BasicTest(TestCase):
                      no_input=True,
                      extra_context=self.defaults)
         os.chdir('world-domination')
-        os.link(os.path.join(self.our_dir, 'eggs'), 'eggs')
-        os.link(os.path.join(self.our_dir, 'downloads'), 'downloads')
         exit_code = subprocess.call(['ln',
                                      '-s',
                                      'development.cfg',
