@@ -5,3 +5,5 @@ develop-eggs/
 parts/
 *.pyc
 nosetests.xml
+eggs/
+downloads/

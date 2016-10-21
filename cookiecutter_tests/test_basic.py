@@ -1,5 +1,5 @@
 from cookiecutter.main import cookiecutter
-from cookiecutter.utils import rmtree
+from shutil import rmtree
 from unittest import TestCase
 
 import os
@@ -21,6 +21,12 @@ class BasicTest(TestCase):
         }
 
     def tearDown(self):
+        for possible_hardlink in ['eggs', 'downloads']:
+            hardlink = os.path.join(self.temp_dir, possible_hardlink)
+            if os.path.exists(hardlink):
+                os.remove(hardlink)
+                # This way we don't zap the full contents of these dirs:
+                # they're meant as cache.
         rmtree(self.temp_dir)
         os.chdir(self.our_dir)
 
@@ -36,6 +42,13 @@ class BasicTest(TestCase):
                      no_input=True,
                      extra_context=self.defaults)
         os.chdir('world-domination')
+        os.link(os.path.join(self.our_dir, 'eggs'), 'eggs')
+        os.link(os.path.join(self.our_dir, 'downloads'), 'downloads')
+        exit_code = subprocess.call(['ln',
+                                     '-s',
+                                     'development.cfg',
+                                     'buildout.cfg'])
+        self.assertEquals(0, exit_code)
         exit_code = subprocess.call(['docker-compose',
                                      'run',
                                      'web',

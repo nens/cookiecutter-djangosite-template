@@ -7,6 +7,7 @@
 # database ports go into localsettings.py.  May your hear turn purple if you
 # ever put personal settings into this file or into developmentsettings.py!
 
+import logging
 import os
 import tempfile
 
@@ -42,7 +43,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
         'console': {
             'level': 'DEBUG',
@@ -72,11 +73,6 @@ LOGGING = {
             'propagate': False,
             'level': 'DEBUG',
         },
-        'south': {
-            'handlers': ['console', 'logfile', 'sentry'],
-            'propagate': False,
-            'level': 'INFO',  # Suppress the huge output in tests
-        },
         'factory': {
             'handlers': ['console'],
             'propagate': False,
@@ -89,11 +85,6 @@ LOGGING = {
         },
     }
 }
-
-# Triple blast.  Needed to get matplotlib from barfing on the server: it needs
-# to be able to write to some directory.
-if 'MPLCONFIGDIR' not in os.environ:
-    os.environ['MPLCONFIGDIR'] = tempfile.gettempdir()
 
 # Production, so DEBUG is False. developmentsettings.py sets it to True.
 DEBUG = False
@@ -184,21 +175,16 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Lizard security.
-    'tls.TLSRequestMiddleware',
-    'lizard_security.middleware.SecurityMiddleware',
     )
 
 INSTALLED_APPS = (
     '{{ cookiecutter.package_name }}',
-    'lizard_security',
     'raven.contrib.django.raven_compat',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.gis',
-    'django.contrib.markup',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
