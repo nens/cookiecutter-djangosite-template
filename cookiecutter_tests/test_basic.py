@@ -3,6 +3,7 @@ from cookiecutter.utils import rmtree
 from unittest import TestCase
 
 import os
+import subprocess
 import tempfile
 
 
@@ -29,3 +30,25 @@ class BasicTest(TestCase):
                      extra_context=self.defaults)
         self.assertIn('README.rst',
                       os.listdir(self.temp_dir + '/world-domination'))
+
+    def test_django_tests_run(self):
+        cookiecutter(self.our_dir,
+                     no_input=True,
+                     extra_context=self.defaults)
+        os.chdir('world-domination')
+        exit_code = subprocess.call(['docker-compose',
+                                     'run',
+                                     'web',
+                                     'python3',
+                                     'bootstrap.py'])
+        self.assertEquals(0, exit_code)
+        exit_code = subprocess.call(['docker-compose',
+                                     'run',
+                                     'web',
+                                     'bin/buildout'])
+        self.assertEquals(0, exit_code)
+        exit_code = subprocess.call(['docker-compose',
+                                     'run',
+                                     'web',
+                                     'bin/test'])
+        self.assertEquals(0, exit_code)
