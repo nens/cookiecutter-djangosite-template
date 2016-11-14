@@ -37,7 +37,7 @@ class BasicTest(TestCase):
                      extra_context=self.defaults)
         os.chdir('world-domination')
         exit_code = subprocess.call(['ln',
-                                     '-s',
+                                     '-sf',
                                      'development.cfg',
                                      'buildout.cfg'])
         self.assertEquals(0, exit_code)
@@ -57,3 +57,11 @@ class BasicTest(TestCase):
                                      'web',
                                      'bin/test'])
         self.assertEquals(0, exit_code)
+        exit_code = subprocess.call(['docker-compose',
+                                     'run',
+                                     'web',
+                                     'bin/django',
+                                     'check'])
+        self.assertEquals(0, exit_code)
+        exit_code = subprocess.call(['docker-compose',
+                                     'down'])
