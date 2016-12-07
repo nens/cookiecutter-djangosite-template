@@ -88,9 +88,6 @@ LOGGING = {
 
 # Production, so DEBUG is False. developmentsettings.py sets it to True.
 DEBUG = False
-# Show template debug information for faulty templates.  Only used when DEBUG
-# is set to True.
-TEMPLATE_DEBUG = True
 
 # ADMINS get internal error mails, MANAGERS get 404 mails.
 ADMINS = (
@@ -167,6 +164,23 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     # Below is the default list, don't modify it.
