@@ -26,7 +26,15 @@ checkout, bin/buildout, migration and supervisor restart.
 
 General usage::
 
-  $ ansible-playbook --inventory ansible/staging ansible/deploy.yml
+  $ ansible-playbook --inventory ansible/staging_inventory ansible/deploy.yml
+
+Only needed for the initial install or when the nginx config has been changed
+and so::
+
+  $ ansible-playbook --inventory ansible/staging_inventory ansible/provision.yml
+
+If you don't have an ssh key set up, add ``-k`` to log in. ``-K`` asks for a
+sudo password if it isn't set up as passwordless.
 
 
 Development with Docker
