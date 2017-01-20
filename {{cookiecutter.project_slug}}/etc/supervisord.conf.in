@@ -22,7 +22,7 @@ password = aosdifsdf
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [program:gunicorn]
-command = ${buildout:bin-directory}/gunicorn-with-settings --bind 0.0.0.0:${serverconfig:gunicorn-port} --workers=${serverconfig:workers} --timeout 90 --preload --max-requests=${serverconfig:maxrequests} sso.wsgi
+command = ${buildout:bin-directory}/gunicorn-with-settings --bind 0.0.0.0:${serverconfig:gunicorn-port} --workers=${serverconfig:workers} --timeout 90 --preload --max-requests=${serverconfig:maxrequests} {{cookiecutter:package_name}}.wsgi
 process_name = gunicorn
 directory = ${buildout:directory}
 priority = 10
