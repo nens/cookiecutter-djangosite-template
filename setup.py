@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-version = '0.6.dev0'
+version = '0.1'
 
 install_requires = [
     'cookiecutter',
