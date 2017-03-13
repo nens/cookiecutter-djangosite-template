@@ -54,6 +54,7 @@ First-time usage::
     $ docker-compose run --rm web python3 bootstrap.py
     $ docker-compose run --rm web bin/buildout
     $ docker-compose run --rm web bin/django migrate  # use '--fake-initial' if there are initial migrations
+    $ docker-compose run --rm web bin/django createsuperuser
     $ docker-compose up
 
 The site will now run on http://localhost:5000
