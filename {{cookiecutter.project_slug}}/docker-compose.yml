@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: 'buildout'
       POSTGRES_USER: 'buildout'
-      POSTGRES_DB: 'sso'
+      POSTGRES_DB: '{{ cookiecutter.package_name }}'
       PGDATA: '/var/lib/postgresql/data/pgdata'
 
   web:
