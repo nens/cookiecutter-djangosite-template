@@ -23,6 +23,7 @@ bower_components/
 node_modules/
 .DS_Store
 doc/build/
+ansible/*.retry
 
 # Unit test / coverage reports
 .coverage
