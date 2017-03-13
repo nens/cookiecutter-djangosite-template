@@ -1,0 +1,40 @@
+# Pyc/pyo/backup files.
+*.py[co]
+*~
+*.swp
+*.pyc
+
+# Packages/buildout/pip
+*.egg
+*.egg-info
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+buildout.cfg
+pip-log.txt
+buildout.log
+.mr.developer.cfg
+src
+bower_components/
+node_modules/
+.DS_Store
+doc/build/
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+.codeintel
+coverage.xml
+
+# Ignore generated config files
+etc/*.nginx.conf
+etc/*.logrotate
+
+# Ignore local settings files
+local*settings*.py
