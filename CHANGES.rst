@@ -2,7 +2,7 @@ Changelog for cookiecutter-djangosite-template
 ==============================================
 
 
-0.2 (unreleased)
+1.0 (2017-05-05)
 ----------------
 
 - Improved coverage setup.
