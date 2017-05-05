@@ -5,7 +5,10 @@ Changelog for cookiecutter-djangosite-template
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Improved coverage setup.
+
+- Better Jenkinsfile (including docker-compose cleanup and coverage
+  reporting).
 
 
 0.1 (2017-03-13)
