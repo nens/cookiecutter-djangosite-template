@@ -35,6 +35,7 @@ coverage.xml
 
 # Ignore generated config files
 etc/*.nginx.conf
+etc/*.supervisord.conf
 etc/*.logrotate
 
 # Ignore local settings files
