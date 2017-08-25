@@ -14,7 +14,7 @@ tests_require = [
 setup(
     name='cookiecutter-djangosite-template',
     packages=[],
-    version='0.1.dev0',
+    version=version,
     description='Cookiecutter template for a Python package',
     author='Reinout van Rees',
     license='MIT',
