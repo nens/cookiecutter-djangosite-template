@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     python-pip \
     python3-psycopg2 \
+    python3-gdal \
     supervisor \
     gettext \
     postgresql-client \
