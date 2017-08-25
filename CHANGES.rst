@@ -2,10 +2,10 @@ Changelog for cookiecutter-djangosite-template
 ==============================================
 
 
-0.2 (unreleased)
+1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Small fixes (unpinned setuptools, added gdal).
 
 
 1.0 (2017-05-05)
