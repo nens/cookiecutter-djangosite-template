@@ -2,6 +2,12 @@ Changelog for cookiecutter-djangosite-template
 ==============================================
 
 
+1.2 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 1.1 (2017-08-25)
 ----------------
 
