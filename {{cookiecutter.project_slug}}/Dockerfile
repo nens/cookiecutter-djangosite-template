@@ -18,5 +18,7 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
 && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install --upgrade setuptools zc.buildout
+
 VOLUME /code
 WORKDIR /code

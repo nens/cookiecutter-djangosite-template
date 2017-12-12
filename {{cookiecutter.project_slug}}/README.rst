@@ -51,8 +51,7 @@ First-time usage::
 
     $ ln -s development.cfg buildout.cfg
     $ docker-compose build
-    $ docker-compose run --rm web python3 bootstrap.py
-    $ docker-compose run --rm web bin/buildout
+    $ docker-compose run --rm web buildout
     $ docker-compose run --rm web bin/django migrate  # use '--fake-initial' if there are initial migrations
     $ docker-compose run --rm web bin/django createsuperuser
     $ docker-compose up
