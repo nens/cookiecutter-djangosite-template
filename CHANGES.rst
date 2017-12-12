@@ -5,7 +5,11 @@ Changelog for cookiecutter-djangosite-template
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Updated jenkins setup: new workspace location means we need a setting to
+  differentiate branches.
+
+- Updated buildout setup: no more bootstrap, but a globally installed
+  buildout.
 
 
 1.1 (2017-08-25)
