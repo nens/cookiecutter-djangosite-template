@@ -3,9 +3,9 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from django.conf.urls import include
-from django.conf.urls import path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import include
+from django.urls import path
 
 from {{ cookiecutter.package_name }} import views
 
