@@ -11,6 +11,19 @@ Changelog for cookiecutter-djangosite-template
 - Updated buildout setup: no more bootstrap, but a globally installed
   buildout.
 
+- Updated urls.py to django 2.0.
+
+- In development, a ``var/log/sql.log`` is created so that you can get a
+  better feel for the number of queries.
+
+- More modern Jenkinsfile:
+
+    - Better project name, needed because of recent jenkins changes.
+
+    - "Try/except" at the end so that docker cleanup is always done.
+
+- Assuming python3.
+
 
 1.1 (2017-08-25)
 ----------------

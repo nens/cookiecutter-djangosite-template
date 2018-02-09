@@ -36,6 +36,10 @@ class BasicTest(TestCase):
                      no_input=True,
                      extra_context=self.defaults)
         os.chdir('world-domination')
+        subprocess.call(['docker-compose',
+                         'down',
+                         '--volumes',
+                         '--remove-orphans'])
         exit_code = subprocess.call(['ln',
                                      '-sf',
                                      'development.cfg',
@@ -44,13 +48,7 @@ class BasicTest(TestCase):
         exit_code = subprocess.call(['docker-compose',
                                      'run',
                                      'web',
-                                     'python3',
-                                     'bootstrap.py'])
-        self.assertEquals(0, exit_code)
-        exit_code = subprocess.call(['docker-compose',
-                                     'run',
-                                     'web',
-                                     'bin/buildout'])
+                                     'buildout'])
         self.assertEquals(0, exit_code)
         exit_code = subprocess.call(['docker-compose',
                                      'run',
@@ -64,4 +62,6 @@ class BasicTest(TestCase):
                                      'check'])
         self.assertEquals(0, exit_code)
         exit_code = subprocess.call(['docker-compose',
-                                     'down'])
+                                     'down',
+                                     '--volumes',
+                                     '--remove-orphans'])
