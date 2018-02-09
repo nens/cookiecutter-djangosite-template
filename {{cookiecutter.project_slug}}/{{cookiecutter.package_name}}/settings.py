@@ -57,6 +57,13 @@ LOGGING = {
             'filename': os.path.join(BUILDOUT_DIR,
                                      'var', 'log', 'django.log'),
         },
+        'sqllogfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'verbose',
+            'filename': os.path.join(BUILDOUT_DIR,
+                                     'var', 'log', 'sql.log'),
+        },
         'sentry': {
             'level': 'WARN',
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
@@ -69,7 +76,9 @@ LOGGING = {
             'level': 'INFO',
         },
         'django.db.backends': {
-            'handlers': ['null'],  # Quiet by default!
+            'handlers': ['null'],
+            # Quiet by default! You can set it to ``['sqllogfile']``, which is
+            # done in the development settings.
             'propagate': False,
             'level': 'DEBUG',
         },

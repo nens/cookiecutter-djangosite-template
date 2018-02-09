@@ -4,6 +4,7 @@ from {{ cookiecutter.package_name }}.settings import *
 DEBUG = True
 
 LOGGING['loggers']['']['level'] = 'DEBUG'
+LOGGING['loggers']['django.db.backends']['handlers'] = ['sqllogfile']
 RAVEN_CONFIG = {}
 
 DATABASES = {
