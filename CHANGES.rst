@@ -2,7 +2,7 @@ Changelog for cookiecutter-djangosite-template
 ==============================================
 
 
-1.2 (unreleased)
+1.2 (2018-02-09)
 ----------------
 
 - Updated jenkins setup: new workspace location means we need a setting to
