@@ -37,7 +37,7 @@ class BasicTest(TestCase):
                      extra_context=self.defaults)
         os.chdir('world-domination')
         subprocess.call(['docker-compose',
-                         'down'
+                         'down',
                          '--volumes',
                          '--remove-orphans'])
         exit_code = subprocess.call(['ln',
@@ -62,6 +62,6 @@ class BasicTest(TestCase):
                                      'check'])
         self.assertEquals(0, exit_code)
         exit_code = subprocess.call(['docker-compose',
-                                     'down'
+                                     'down',
                                      '--volumes',
                                      '--remove-orphans'])
