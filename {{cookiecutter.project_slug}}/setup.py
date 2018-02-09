@@ -1,4 +1,3 @@
-import monkeypatch_setuptools
 from setuptools import setup
 
 version = '0.1dev'
