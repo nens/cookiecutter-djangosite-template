@@ -44,13 +44,7 @@ class BasicTest(TestCase):
         exit_code = subprocess.call(['docker-compose',
                                      'run',
                                      'web',
-                                     'python3',
-                                     'bootstrap.py'])
-        self.assertEquals(0, exit_code)
-        exit_code = subprocess.call(['docker-compose',
-                                     'run',
-                                     'web',
-                                     'bin/buildout'])
+                                     'buildout'])
         self.assertEquals(0, exit_code)
         exit_code = subprocess.call(['docker-compose',
                                      'run',
