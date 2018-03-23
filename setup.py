@@ -4,7 +4,7 @@ version = '1.3.dev0'
 
 install_requires = [
     'cookiecutter',
-    ],
+    ]
 
 tests_require = [
     'coverage',

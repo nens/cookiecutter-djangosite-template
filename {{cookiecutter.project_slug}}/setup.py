@@ -15,7 +15,7 @@ install_requires = [
     'python-memcached',
     'raven',
     'werkzeug',
-    ],
+    ]
 
 tests_require = [
     'nose',
