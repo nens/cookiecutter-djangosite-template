@@ -40,3 +40,6 @@ etc/*.logrotate
 
 # Ignore local settings files
 local*settings*.py
+
+# Pycharm
+.idea
