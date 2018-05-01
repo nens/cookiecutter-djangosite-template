@@ -7,8 +7,8 @@
   become: yes
   tasks:
 
-    - name: Add user "buildout" and disable its password
-      user: name=buildout password='' state=present shell="/bin/bash"
+    - name: Add user "buildout" and set an unusable password
+      user: name=buildout password='*' state=present shell="/bin/bash"
 
     - name: "Add maintainers' ssh keys so they can log in as user buildout."
       authorized_key: user=buildout key=https://github.com/{% raw %}{{ item}}{% endraw %}.keys
