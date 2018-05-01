@@ -5,7 +5,7 @@ Changelog for cookiecutter-djangosite-template
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Create the 'buildout' user with an unusable password.
 
 
 1.2 (2018-02-09)
