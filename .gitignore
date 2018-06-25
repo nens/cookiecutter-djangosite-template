@@ -8,3 +8,7 @@ nosetests.xml
 eggs/
 downloads/
 .idea
+.venv
+
+# this is a library, so we ignore Pipfile.lock
+Pipfile.lock
