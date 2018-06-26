@@ -9,12 +9,9 @@ long_description = '\n\n'.join([
 
 install_requires = [
     'Django',
-    'django-extensions',
-    'django-nose',
     'gunicorn',
     'python-memcached',
-    'raven',
-    'werkzeug',
+    'raven',  # for sentry logging
     ]
 
 tests_require = [

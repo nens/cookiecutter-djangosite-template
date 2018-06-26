@@ -1,0 +1,22 @@
+[[source]]
+url = "https://packages.lizard.net"
+verify_ssl = true
+name = "nens"
+
+[dev-packages]
+coverage = "*"
+nose = "*"
+"zest.releaser" = "*"
+"pep8" = "*"
+pyflakes = "*"
+
+[packages]
+# Should always be installed like this, else setup.py is bypassed (and we would
+# have to modify PYTHONPATH at several points in the project)
+"e1839a8" = {path = ".", editable = true}
+# psycopg2 is not listed in setup.py, but still necessary as Django backend.
+# This includes the binaries: it is not required to install these with apt
+"psycopg2-binary" = "*"
+
+[requires]
+python_version = "3.5"
