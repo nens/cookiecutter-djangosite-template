@@ -1,7 +1,13 @@
 [web]
-112-sso-d3.external-nens.local
+todo.your.staging.host.name
 
 [web:vars]
-site_name={{ cookiecutter.project_slug }}.staging.lizard.net
-checkout_name="master"
-buildout_cfg=staging.cfg
+site_name = {{ site_name }}
+package_name = {{ package_name }}
+project_path: "/srv/{% raw %}{{ site_name }}{% endraw %}"
+django_settings = {{ project_name }}.stagingsettings
+supervisor_port = todo.put.port.here
+gunicorn_port = todo.put.port.here
+gunicorn_workers = 3
+gunicorn_max_requests = 500
+celery_concurrency = 4

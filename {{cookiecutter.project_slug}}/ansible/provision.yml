@@ -7,59 +7,65 @@
   become: yes
   tasks:
 
-    - name: Add user "buildout" and set an unusable password
-      user: name=buildout password='*' state=present shell="/bin/bash"
+    - name: Add user "buildout" and set an unusable password.
+      user:
+        name: buildout
+        password: '*'
+        state: present
+        shell: "/bin/bash"
 
     - name: "Add maintainers' ssh keys so they can log in as user buildout."
-      authorized_key: user=buildout key=https://github.com/{% raw %}{{ item}}{% endraw %}.keys
+      authorized_key:
+        user: buildout
+        key: https://github.com/{{ item }}.keys
       with_items:
-        - reinout
-        - TODO
+        - !!TODO.fill.in.your.username
 
-    - name: Install various packages
-      apt: name={% raw %}{{item}}{% endraw %} state=latest
+    - name: Install apt packages.
+      apt: name={{ item }} state=latest
       with_items:
-        - wget
-        - build-essential
         - git
-        - libevent-dev
-        - libfreetype6-dev
-        - libgeos-dev
-        - libpng12-dev
-        - python3-dev
-        - python3-pip
-        - python3-psycopg2
-        - libssl-dev
+        - python-dev
+        - python-pip
         - supervisor
         - nginx
+        # - libgdal-dev   # if you need pygdal
+        # - gdal-bin      # if you need gdal command line
+        # - python-gdal   # if you need gdal command line python scripts
 
-    - name: Create dir inside /srv for the checkout
+    - name: Upgrade setuptools, pip, and pipenv.
+      pip: name={{ item }} extra_args="--upgrade"
+      with_items:
+        - setuptools
+        - pip
+        - pipenv
+
+    - name: Create dir inside /srv for the checkout.
       file:
-        path: /srv/{% raw %}{{ site_name }}{% endraw %}
+        path: {{ project_path }}
         state: directory
         mode: 0755
         owner: buildout
         group: buildout
 
     - name: "Look if nginx config already exists (you'll need to run deploy first!)"
-      stat: path=/srv/{% raw %}{{ site_name }}/etc/{{ site_name }}{% endraw %}.nginx.conf
+      stat: path={{ project_path }}/etc/{{ site_name }}.nginx.conf
       register: nginx_conffile
 
-    - name: Symlink nginx config, when available
+    - name: Symlink nginx config, when available.
       file:
-        src: /srv/{% raw %}{{ site_name }}/etc/{{ site_name }}{% endraw %}.nginx.conf
-        dest: /etc/nginx/sites-available/{% raw %}{{ site_name }}{% endraw %}.nginx.conf
+        src: {{ project_path }}/etc/{{ site_name }}.nginx.conf
+        dest: /etc/nginx/sites-available/{{ site_name }}.nginx.conf
         state: link
       when: nginx_conffile.stat.exists
 
-    - name: Enable nginx config, when available
+    - name: Enable nginx config, when available.
       file:
-        src: /etc/nginx/sites-available/{% raw %}{{ site_name }}{% endraw %}.nginx.conf
-        dest: /etc/nginx/sites-enabled/{% raw %}{{ site_name }}{% endraw %}.nginx.conf
+        src: /etc/nginx/sites-available/{{ site_name }}.nginx.conf
+        dest: /etc/nginx/sites-enabled/{{ site_name }}.nginx.conf
         state: link
       when: nginx_conffile.stat.exists
 
-    - name: Restart nginx
+    - name: Restart nginx.
       service: name=nginx state=reloaded
       when: nginx_conffile.stat.exists
-      # Perhaps some safety check that the config is OK?

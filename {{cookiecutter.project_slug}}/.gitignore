@@ -4,7 +4,7 @@
 *.swp
 *.pyc
 
-# Packages/buildout/pip
+# Packages/buildout/pip/pipenv
 *.egg
 *.egg-info
 eggs
@@ -24,6 +24,7 @@ node_modules/
 .DS_Store
 doc/build/
 ansible/*.retry
+.venv
 
 # Unit test / coverage reports
 .coverage
