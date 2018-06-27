@@ -29,6 +29,7 @@
         - python3-pip
         - supervisor
         - nginx
+        - libpq-dev       # for psycopg2 (postgres backend)
         # - libgdal-dev   # if you need pygdal
         # - gdal-bin      # if you need gdal command line
         # - python-gdal   # if you need gdal command line python scripts
