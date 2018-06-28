@@ -1,10 +1,10 @@
 node {
    stage "Build"
    checkout scm
-   sh "python3 bootstrap.py"
-   sh "bin/buildout"
+   sh "rm -rf .venv"
+   sh "pipenv install --deploy --dev"
 
    stage "Test"
-   sh "bin/test"
+   sh "pipenv run nosetests"
    step $class: 'JUnitResultArchiver', testResults: 'nosetests.xml'
 }

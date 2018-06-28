@@ -2,11 +2,11 @@
 todo.your.production.host.name
 
 [web:vars]
-site_name = {{ site_name }}
-project_slug = {{ project_slug }}
-package_name = {{ package_name }}
+site_name = {{ cookiecutter.package_name }}.lizard.net
+project_slug = {{ cookiecutter.project_slug }}
+package_name = {{ cookiecutter.package_name }}
 project_path: "/srv/{% raw %}{{ site_name }}{% endraw %}"
-django_settings = {{ package_name }}.settings
+django_settings = {{ cookiecutter.package_name }}.settings
 supervisor_port = todo.put.port.here
 gunicorn_port = todo.put.port.here
 gunicorn_workers = 3

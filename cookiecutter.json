@@ -4,8 +4,7 @@
     "github_name": "Your github username",
     "project_slug": "your-project-with-dashes",
     "package_name": "{{ cookiecutter.project_slug.lower().replace('-', '_') }}",
-    "site_name": "{{ project_slug}}.lizard.net"
-    "project_short_description": "A short description of the project"
+    "project_short_description": "A short description of the project",
     "_copy_without_render": [
         "ansible/templates/*.j2",
         "ansible/deploy.yml",

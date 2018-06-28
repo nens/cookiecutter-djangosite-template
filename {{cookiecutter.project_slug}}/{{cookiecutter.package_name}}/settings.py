@@ -185,7 +185,6 @@ MIDDLEWARE_CLASSES = (
 INSTALLED_APPS = (
     '{{ cookiecutter.package_name }}',
     'raven.contrib.django.raven_compat',
-    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

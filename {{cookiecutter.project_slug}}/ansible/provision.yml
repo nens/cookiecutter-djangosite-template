@@ -28,6 +28,7 @@
         - python3-dev
         - python3-pip
         - supervisor
+        - memcached
         - nginx
         - libpq-dev       # for psycopg2 (postgres backend)
         # - libgdal-dev   # if you need pygdal
