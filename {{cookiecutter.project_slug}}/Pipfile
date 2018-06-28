@@ -13,9 +13,6 @@ pyflakes = "*"
 [packages]
 # Main site should always be installed like this, else setup.py is bypassed
 "e1839a8" = {path = ".", editable = true}
-# psycopg2 requires libpq-dev; install this with apt
-"psycopg2" = "*"
-gunicorn = "*"
 # pygdal requires libgdal-dev; on Ubuntu 16 this should be pinned to 1.11.3
 # pygdal = "1.11.3.*"
 
