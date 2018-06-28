@@ -6,6 +6,52 @@ Introduction
 Usage, etc.
 
 
+Development
+-----------
+
+This project makes use of `Pipenv <https://docs.pipenv.org/>`_., which creates
+a project virtual environment. We like to keep this virtual environment inside
+``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
+behaviour, so we need to set the following environment variable:
+``export PIPENV_VENV_IN_PROJECT=1``. If you add that to your ``.bashrc``, you
+don't need to specify it each time.
+
+Install the environment::
+
+    $ cd {{ cookiecutter.project_slug }}
+    $ pipenv install --deploy --dev
+    $ mkdir -p var/static var/media var/log
+
+
+Define appropriate local settings (deltaportaal/localsettings.py):
+
+.. code-block:: python
+
+    DATABASES = {
+        'default': {
+            'NAME': 'deltaportaal',
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'USER': 'buildout',
+            'PASSWORD': 'buildout',
+            'HOST': 'localhost',
+            'PORT': '5433',
+            }
+        }
+
+
+Start the database::
+
+    $ docker-compose up db
+
+Migrate the database::
+
+    $ pipenv run python manage.py migrate
+
+Run the webserver using your favourite IDE, or from the commandline::
+
+    $ pipenv run python manage.py runserver 0.0.0.0:5000
+
+
 Installation on the server
 --------------------------
 
@@ -26,12 +72,12 @@ checkout, bin/buildout, migration and supervisor restart.
 
 General usage::
 
-  $ ansible-playbook --inventory ansible/staging_inventory ansible/deploy.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml
 
 Only needed for the initial install or when the nginx config has been changed
 and so::
 
-  $ ansible-playbook --inventory ansible/staging_inventory ansible/provision.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/provision.yml
 
 If you don't have an ssh key set up, add ``-k`` to log in. ``-K`` asks for a
 sudo password if it isn't set up as passwordless.
@@ -49,23 +95,15 @@ instance will automatically pick it up.
 
 First-time usage::
 
-    $ ln -s development.cfg buildout.cfg
+    $ export UID  # or add this to your .bashrc
     $ docker-compose build
-    $ docker-compose run --rm web buildout
-    $ docker-compose run --rm web bin/django migrate  # use '--fake-initial' if there are initial migrations
-    $ docker-compose run --rm web bin/django createsuperuser
+    $ docker-compose run --rm web pipenv install --deploy --dev
+    $ docker-compose run --rm web pipenv run python manage.py migrate
     $ docker-compose up
 
 The site will now run on http://localhost:5000
 
 Running the tests::
 
-    $ docker-compose run --rm web bin/test
+    $ docker-compose run --rm web pipenv run python manage.py test
 
-Note: on Linux the files generated in Docker will be owned by root. To fix this you
-can run something like this inside your project directory::
-
-    $ sudo chown -R $USER:$USER .
-
-Adjust the list of ``.deb`` packages in Dockerfile if needed - and keep it in
-sync with ``ansible/provision.yml``.
