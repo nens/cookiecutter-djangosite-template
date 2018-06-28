@@ -22,7 +22,7 @@ password = aosdifsdf
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [program:gunicorn]
-command = pipenv run gunicorn --bind=0.0.0.0:{{ gunicorn_port }} --workers={{ gunicorn_workers }} --timeout=90 --preload --max-requests={{ gunicorn_max_requests }} {{ package_name }}.wsgi
+command = /usr/local/bin/pipenv run gunicorn --bind=0.0.0.0:{{ gunicorn_port }} --workers={{ gunicorn_workers }} --timeout=90 --preload --max-requests={{ gunicorn_max_requests }} {{ package_name }}.wsgi
 process_name = gunicorn
 directory = {{ project_path }}
 priority = 10
@@ -31,7 +31,7 @@ autostart = true
 autorestart = true
 
 [program:celeryd]
-command = pipenv run celery worker --app={{ app }} --concurrency={{ celery_concurrency }} --pidfile=var/celery.pid --loglevel=info --task-events
+command = /usr/local/bin/pipenv run celery worker --app={{ app }} --concurrency={{ celery_concurrency }} --pidfile=var/celery.pid --loglevel=info --task-events
 process_name = celeryd
 directory = {{ project_path }}
 priority = 20
