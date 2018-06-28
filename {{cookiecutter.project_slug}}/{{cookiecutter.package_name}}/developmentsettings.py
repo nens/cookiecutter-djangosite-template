@@ -11,12 +11,14 @@ DATABASES = {
     'default': {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.db.backends.postgresql',
-        'USER': 'buildout',
-        'PASSWORD': 'buildout',
+        'USER': 'nens',
+        'PASSWORD': 'nens',
         'HOST': 'db',  # 'db' is the postgres docker name
         'PORT': 5432,
     }
 }
+
+ALLOWED_HOSTS = ['localhost']
 
 try:
     from {{ cookiecutter.package_name }}.localsettings import *

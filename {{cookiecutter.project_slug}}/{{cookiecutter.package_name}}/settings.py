@@ -7,25 +7,12 @@
 # database ports go into localsettings.py.  May your hear turn purple if you
 # ever put personal settings into this file or into developmentsettings.py!
 
-import logging
 import os
-import tempfile
 
-# Set matplotlib defaults.
-# Uncomment this when using lizard-map.
-# import matplotlib
-# # Force matplotlib to not use any Xwindows backend.
-# matplotlib.use('Agg')
-# import lizard_map.matplotlib_settings
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# In older projects, this setting is called BUILDOUT_DIR
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# SETTINGS_DIR allows media paths and so to be relative to this settings file
-# instead of hardcoded to c:\only\on\my\computer.
-SETTINGS_DIR = os.path.dirname(os.path.realpath(__file__))
-
-# BUILDOUT_DIR is for access to the "surrounding" buildout, for instance for
-# BUILDOUT_DIR/var/static files to give django-staticfiles a proper place
-# to place all collected static files.
-BUILDOUT_DIR = os.path.abspath(os.path.join(SETTINGS_DIR, '..'))
 
 # Set up logging. No console logging. By default, var/log/django.log and
 # sentry at 'WARN' level.
@@ -54,15 +41,13 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': os.path.join(BUILDOUT_DIR,
-                                     'var', 'log', 'django.log'),
+            'filename': os.path.join(BASE_DIR, 'var', 'log', 'django.log'),
         },
         'sqllogfile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': os.path.join(BUILDOUT_DIR,
-                                     'var', 'log', 'sql.log'),
+            'filename': os.path.join(BASE_DIR, 'var', 'log', 'sql.log'),
         },
         'sentry': {
             'level': 'WARN',
@@ -98,12 +83,6 @@ LOGGING = {
 # Production, so DEBUG is False. developmentsettings.py sets it to True.
 DEBUG = False
 
-# ADMINS get internal error mails, MANAGERS get 404 mails.
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
-MANAGERS = ADMINS
-
 # TODO: Switch this to the real production database.
 # ^^^ 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # In case of geodatabase, prepend with: django.contrib.gis.db.backends.(postgis)
@@ -112,11 +91,13 @@ DATABASES = {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'USER': '{{ cookiecutter.package_name }}',
-        'PASSWORD': '*9jlzpm28k',
-        'HOST': 'p-web-db-00-d03.external-nens.local',
+        'PASSWORD': 'todo.dbpassword',
+        'HOST': 'todo.dbhost',
         'PORT': '5432',
         }
     }
+
+WSGI_APPLICATION = '{{ cookiecutter.package_name }}.wsgi.application'
 
 # Almost always set to 1.  Django allows multiple sites in one database.
 SITE_ID = 1
@@ -140,12 +121,16 @@ LANGUAGES = (
 # load the internationalization machinery.
 USE_I18N = True
 
+USE_L10N = True
+
+USE_TZ = True
+
 # Absolute path to the directory that holds user-uploaded media.
-MEDIA_ROOT = os.path.join(BUILDOUT_DIR, 'var', 'media')
-# Absolute path to the directory where django-staticfiles'
-# "bin/django build_static" places all collected static files from all
+MEDIA_ROOT = os.path.join(BASE_DIR, 'var', 'media')
+# Absolute path to the directory where
+# "python manage.py collectstatic" places all collected static files from all
 # applications' /media directory.
-STATIC_ROOT = os.path.join(BUILDOUT_DIR, 'var', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'var', 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -153,11 +138,6 @@ MEDIA_URL = '/media/'
 # URL for the per-application /media static files collected by
 # django-staticfiles.
 STATIC_URL = '/static_media/'
-
-STATICFILES_DIRS = [
-    os.path.join(BUILDOUT_DIR, 'bower_components'),
-    # ^^^ bower-managed files.
-]
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'i@mq5&hw$tw*=+)u$&i62mflg80=q%s#fr@$exb0jfo@(lg%to'
@@ -168,7 +148,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 CACHES = {
     'default': {
-        'KEY_PREFIX': BUILDOUT_DIR,
+        'KEY_PREFIX': BASE_DIR,
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
     }
@@ -193,11 +173,13 @@ TEMPLATES = [
 
 MIDDLEWARE_CLASSES = (
     # Below is the default list, don't modify it.
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     )
 
 INSTALLED_APPS = (
@@ -209,6 +191,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.gis',
     'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'gunicorn',
@@ -218,10 +201,7 @@ INSTALLED_APPS = (
 # RAVEN_CONFIG = {
 #     'dsn': ('http://some:hash@your.sentry.site/some_number')}
 
-# TODO: add gauges ID here. Generate one separately for the staging, too.
-UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
-
-# Add your production name here. Django 1.6+
+# Add your production name here
 ALLOWED_HOSTS = ['{{ cookiecutter.package_name }}.lizard.net']
 
 try:
