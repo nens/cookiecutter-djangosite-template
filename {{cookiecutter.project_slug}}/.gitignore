@@ -44,3 +44,6 @@ local*settings*.py
 
 # Pycharm
 .idea
+
+# Docker
+docker-compose.override.yml

@@ -19,7 +19,9 @@
         user: buildout
         key: https://github.com/{{ item }}.keys
       with_items:
-        - !!TODO.fill.in.your.username
+        - byrman
+        - remcogerlich
+        # - add your github username here
 
     - name: Install apt packages.
       apt: name={{ item }} state=latest

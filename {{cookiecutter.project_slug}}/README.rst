@@ -9,7 +9,7 @@ Usage, etc.
 Development
 -----------
 
-This project makes use of `Pipenv <https://docs.pipenv.org/>`_., which creates
+This project makes use of `Pipenv <https://docs.pipenv.org/>`_, which creates
 a project virtual environment. We like to keep this virtual environment inside
 ``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
 behaviour, so we need to set the following environment variable:
@@ -18,26 +18,30 @@ don't need to specify it each time.
 
 Install the environment::
 
-    $ cd {{ cookiecutter.project_slug }}
     $ pipenv install --deploy --dev
     $ mkdir -p var/static var/media var/log
 
+As we want to avoid port clashes, you have to open a port from your host to
+the database inside your docker. You should specify "host:docker" port mappings
+in  a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``,
+as follows:
 
-Define appropriate local settings (deltaportaal/localsettings.py):
+.. code-block:: yaml
+
+    version: '3'
+    services:
+
+      db:
+        ports:
+          - "5435:5432"  # the first one should the one in the localsettings
+
+Also, set the same port in your local django settings
+``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
 
 .. code-block:: python
 
-    DATABASES = {
-        'default': {
-            'NAME': 'deltaportaal',
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'USER': 'buildout',
-            'PASSWORD': 'buildout',
-            'HOST': 'localhost',
-            'PORT': '5433',
-            }
-        }
-
+    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES['default']['PORT'] = '5435'  # match this one with the docker-compose file
 
 Start the database::
 
@@ -93,6 +97,20 @@ be picked up by docker right away.
 The docker setup is also used by ``Jenkinsfile``, which means that our jenkins
 instance will automatically pick it up.
 
+As we want to avoid port clashes, you have to open a ports from your docker
+webserver to your host system. You should specify "host:docker" port mappings in
+a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``, as follows:
+
+.. code-block:: yaml
+
+    version: '3'
+    services:
+
+      db:
+        ports:
+          - "5000:8000"  # pick your favourite port for access from your local browser
+
+
 First-time usage::
 
     $ export UID  # or add this to your .bashrc
@@ -101,7 +119,7 @@ First-time usage::
     $ docker-compose run --rm web pipenv run python manage.py migrate
     $ docker-compose up
 
-The site will now run on http://localhost:5000
+The site will now run on http://localhost:5000 (or whatever port you picked)
 
 Running the tests::
 

@@ -7,8 +7,7 @@ name = "nens"
 coverage = "*"
 nose = "*"
 "zest.releaser" = "*"
-"pep8" = "*"
-pyflakes = "*"
+"flake8" = "*"
 
 [packages]
 # Main site should always be installed like this, else setup.py is bypassed

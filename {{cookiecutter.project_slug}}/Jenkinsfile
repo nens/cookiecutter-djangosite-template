@@ -14,7 +14,7 @@ pipeline {
         }
         stage("Build") {
             steps {
-                sh "docker-compose down -v"
+                sh "docker-compose down --volumes"
                 sh "docker-compose build web"
                 sh "docker-compose run --rm web pipenv --two"
                 sh "docker-compose run --rm web pipenv install --deploy --dev"
@@ -38,7 +38,7 @@ pipeline {
     }
     post {
         always {
-            sh "docker-compose down -v && docker-compose rm -f && rm -rf .venv"
+            sh "docker-compose down --volumes --remove-orphans && docker-compose rm -f && rm -rf .venv"
         }
     }
 }

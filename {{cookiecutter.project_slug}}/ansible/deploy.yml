@@ -56,7 +56,7 @@
         - { src: "templates/nginx.conf.j2", dest: "{{ project_path }}/etc/{{ site_name }}.nginx.conf" }
 
     - name: Run migrations.
-      shell: pipenv run python manage.py migrate
+      shell: pipenv run python manage.py migrate --noinput
       args:
         chdir: {{ project_path }}
 
