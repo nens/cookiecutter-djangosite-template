@@ -2,7 +2,7 @@ node {
    stage "Build"
    checkout scm
    sh "rm -rf .venv"
-   sh "pipenv install --deploy --dev"
+   sh "PIPENV_VENV_IN_PROJECT=1 pipenv sync --dev"
 
    stage "Test"
    sh "pipenv run nosetests"
