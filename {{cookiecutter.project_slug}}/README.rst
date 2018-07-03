@@ -9,8 +9,11 @@ Usage, etc.
 Development
 -----------
 
-This project makes use of `Pipenv <https://docs.pipenv.org/>`_, which creates
-a project virtual environment. We like to keep this virtual environment inside
+This project makes use of Pipenv. If you are new to pipenv, install it and
+study the output of ``pipenv --help``, especially the commands ``pipenv lock``
+and ``pipenv sync``. Or read the `docs <https://docs.pipenv.org/>`_.
+
+We like to keep the project virtual environment inside
 ``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
 behaviour, so we need to set the following environment variable:
 ``export PIPENV_VENV_IN_PROJECT=1``. If you add that to your ``.bashrc``, you
@@ -18,7 +21,7 @@ don't need to specify it each time.
 
 Install the environment::
 
-    $ pipenv install --deploy --dev
+    $ pipenv sync --dev
     $ mkdir -p var/static var/media var/log
 
 As we want to avoid port clashes, you have to open a port from your host to

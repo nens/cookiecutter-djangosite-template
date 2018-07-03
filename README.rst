@@ -8,22 +8,23 @@ can create a fresh Django site project. It replaces the old "nensskel" tool.
 Using this cookiecutter template
 --------------------------------
 
-Install cookiecutter and pipenv ("pip install cookiecutter pipenv").
+Install/upgrade cookiecutter and pipenv::
+
+  $ pip install cookiecutter pipenv --upgrade
+
 
 Run the following command and answer the questions::
 
   $ cookiecutter https://github.com/nens/cookiecutter-djangosite-template
 
-Initialize a new Pipenv configuration using the following commands::
+Decide whether your project is an application or a library (`read more <https://docs.pipenv.org/advanced/#pipfile-vs-setuppy>`_ ).
+For libraries, add ``Pipfile.lock`` to the newly generated ``.gitignore`` file.
+For applications, generate a lockfile by running ``pipenv lock`` and commit the
+generated ``Pipfile.lock``.
 
-  $ pipenv --three
-  $ pipenv install -e .
-
-If you require internal nens packages, adapt the url at the top of ``Pipfile``
-to: ``https://packages.lizard.net``. If you require GDAL in your project, add
-``pygdal`` as as dependency to the ``setup.py`` and pin ``pygdal`` in the
-``Pipfile`` to a version that matches the server OS version (for Ubuntu 16:
-1.11.3) by calling::
+NB: If you require GDAL in your project, add ``pygdal`` as as dependency to the
+``setup.py`` and pin ``pygdal`` in the ``Pipfile`` to a version that matches
+the server OS version (for Ubuntu 16: 1.11.3) by calling::
 
   $ pipenv install pygdal==1.11.3.*
 
