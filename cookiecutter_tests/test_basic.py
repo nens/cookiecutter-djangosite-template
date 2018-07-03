@@ -19,9 +19,9 @@ class BasicTest(TestCase):
             "project_short_description": "Speaks for itself"
         }
 
-    # def tearDown(self):
-    #     rmtree(self.temp_dir, ignore_errors=True)
-    #     os.chdir(self.our_dir)
+    def tearDown(self):
+        rmtree(self.temp_dir, ignore_errors=True)
+        os.chdir(self.our_dir)
 
     def test_smoke(self):
         cookiecutter(self.our_dir,
