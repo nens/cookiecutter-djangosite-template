@@ -32,7 +32,7 @@
         - var/media
 
     - name: "Deploy (look at var/log/pipenv.log if something goes fishy)"
-      shell: pipenv install --deploy --verbose > var/log/pipenv.log 2>&1
+      shell: pipenv sync --verbose > var/log/pipenv.log 2>&1
       environment:
         PIPENV_VENV_IN_PROJECT: 1  # pipenv install --local is coming and will replace this
       args:
