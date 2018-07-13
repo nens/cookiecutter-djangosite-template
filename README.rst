@@ -17,10 +17,12 @@ Run the following command and answer the questions::
 
   $ cookiecutter https://github.com/nens/cookiecutter-djangosite-template
 
-Decide whether your project is an application or a library (`read more <https://docs.pipenv.org/advanced/#pipfile-vs-setuppy>`_ ).
-For libraries, add ``Pipfile.lock`` to the newly generated ``.gitignore`` file.
-For applications, generate a lockfile by running ``pipenv lock`` and commit the
-generated ``Pipfile.lock``.
+Optionally add dependencies to the ``setup.py``. Then generate a lockfile by
+running::
+
+  $ pipenv lock
+
+And commit the resulting ``Pipfile.lock``.
 
 NB: If you require GDAL in your project, add ``pygdal`` as as dependency to the
 ``setup.py`` and pin ``pygdal`` in the ``Pipfile`` to a version that matches
