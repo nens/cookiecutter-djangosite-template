@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: 'nens'
       POSTGRES_PASSWORD: 'nens'
       POSTGRES_DB: '{{ cookiecutter.package_name }}'
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
 
   web:
     build: .
@@ -27,6 +29,8 @@ services:
       - SHELL=/bin/bash
       - SSH_AUTH_SOCK=/tmp/agent.sock
 
+volumes:
+  pgdata:
 
 #for local development, you may need to open some ports by adding a
 #docker-compose.override.yml file with host:docker port mappings
