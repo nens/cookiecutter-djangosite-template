@@ -25,5 +25,5 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 RUN pip3 install --upgrade setuptools pip
 RUN pip3 install pipenv
 
-VOLUME /code
+VOLUME ["/code", "/pipenv_cache"]
 WORKDIR /code
