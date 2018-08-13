@@ -6,6 +6,59 @@ Introduction
 Usage, etc.
 
 
+Development
+-----------
+
+This project makes use of Pipenv. If you are new to pipenv, install it and
+study the output of ``pipenv --help``, especially the commands ``pipenv lock``
+and ``pipenv sync``. Or read the `docs <https://docs.pipenv.org/>`_.
+
+We like to keep the project virtual environment inside
+``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
+behaviour, so we need to set the following environment variable:
+``export PIPENV_VENV_IN_PROJECT=1``. If you add that to your ``.bashrc``, you
+don't need to specify it each time.
+
+Install the environment::
+
+    $ pipenv sync --dev
+    $ mkdir -p var/static var/media var/log
+
+As we want to avoid port clashes, you have to open a port from your host to
+the database inside your docker. You should specify "host:docker" port mappings
+in  a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``,
+as follows:
+
+.. code-block:: yaml
+
+    version: '3'
+    services:
+
+      db:
+        ports:
+          - "5435:5432"  # the first one should the one in the localsettings
+
+Also, set the same port in your local django settings
+``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
+
+.. code-block:: python
+
+    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES['default']['PORT'] = '5435'  # match this one with the docker-compose file
+
+Start the database::
+
+    $ docker-compose up db
+
+Migrate the database::
+
+    $ pipenv run python manage.py migrate
+
+Run the webserver using your favourite IDE, or from the commandline::
+
+    $ pipenv run python manage.py runserver 0.0.0.0:5000
+
+
 Installation on the server
 --------------------------
 
@@ -26,12 +79,12 @@ checkout, bin/buildout, migration and supervisor restart.
 
 General usage::
 
-  $ ansible-playbook --inventory ansible/staging_inventory ansible/deploy.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml
 
 Only needed for the initial install or when the nginx config has been changed
 and so::
 
-  $ ansible-playbook --inventory ansible/staging_inventory ansible/provision.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/provision.yml
 
 If you don't have an ssh key set up, add ``-k`` to log in. ``-K`` asks for a
 sudo password if it isn't set up as passwordless.
@@ -47,25 +100,31 @@ be picked up by docker right away.
 The docker setup is also used by ``Jenkinsfile``, which means that our jenkins
 instance will automatically pick it up.
 
+As we want to avoid port clashes, you have to open a ports from your docker
+webserver to your host system. You should specify "host:docker" port mappings in
+a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``, as follows:
+
+.. code-block:: yaml
+
+    version: '3'
+    services:
+
+      db:
+        ports:
+          - "5000:8000"  # pick your favourite port for access from your local browser
+
+
 First-time usage::
 
-    $ ln -s development.cfg buildout.cfg
+    $ export UID  # or add this to your .bashrc
     $ docker-compose build
-    $ docker-compose run --rm web buildout
-    $ docker-compose run --rm web bin/django migrate  # use '--fake-initial' if there are initial migrations
-    $ docker-compose run --rm web bin/django createsuperuser
+    $ docker-compose run --rm web pipenv install --deploy --dev
+    $ docker-compose run --rm web pipenv run python manage.py migrate
     $ docker-compose up
 
-The site will now run on http://localhost:5000
+The site will now run on http://localhost:5000 (or whatever port you picked)
 
 Running the tests::
 
-    $ docker-compose run --rm web bin/test
+    $ docker-compose run --rm web pipenv run python manage.py test
 
-Note: on Linux the files generated in Docker will be owned by root. To fix this you
-can run something like this inside your project directory::
-
-    $ sudo chown -R $USER:$USER .
-
-Adjust the list of ``.deb`` packages in Dockerfile if needed - and keep it in
-sync with ``ansible/provision.yml``.

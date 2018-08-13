@@ -8,11 +8,27 @@ can create a fresh Django site project. It replaces the old "nensskel" tool.
 Using this cookiecutter template
 --------------------------------
 
-Install cookiecutter ("pip install cookiecutter").
+Install/upgrade cookiecutter and pipenv::
+
+  $ pip install cookiecutter pipenv --upgrade
+
 
 Run the following command and answer the questions::
 
   $ cookiecutter https://github.com/nens/cookiecutter-djangosite-template
+
+Optionally add dependencies to the ``setup.py``. Then generate a lockfile by
+running::
+
+  $ pipenv lock
+
+And commit the resulting ``Pipfile.lock``.
+
+NB: If you require GDAL in your project, add ``pygdal`` as as dependency to the
+``setup.py`` and pin ``pygdal`` in the ``Pipfile`` to a version that matches
+the server OS version (for Ubuntu 16: 1.11.3) by calling::
+
+  $ pipenv install pygdal==1.11.3.*
 
 
 Development of this template itself
@@ -21,9 +37,9 @@ Development of this template itself
 We don't need to run inside a vm/docker ourselves, so to set it up and test
 it, just do the regular::
 
-  $ python3 bootstrap.py
-  $ bin/buildout
-  $ bin/test
+  $ pipenv install --dev
+  $ pipenv run nosetests
+
 
 The test, however, *does* use docker and docker-compose:
 
@@ -31,8 +47,8 @@ The test, however, *does* use docker and docker-compose:
   errors.
 
 - There's a second test that uses the template-generated docker-compose setup
-  to run the ``bin/test`` of the generated django.
+  to run the ``nosetests`` of the generated django.
 
 We don't really need any python code ourselves, so our own ``setup.py``
-doesn't actually point at any code. But it is set up so that ``bin/test``
+doesn't actually point at any code. But it is set up so that ``nosetests``
 finds and runs the tests inside ``./cookiecutter_tests/`` just fine.

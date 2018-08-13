@@ -8,8 +8,8 @@ DATABASES = {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'USER': '{{ cookiecutter.package_name }}',
-        'PASSWORD': 'r_ic!i7%h+',
-        'HOST': 's-web-db-00-d03.external-nens.local',
+        'PASSWORD': 'todo.dbpassword',
+        'HOST': 'todo.dbhost',
         'PORT': '5432',
         },
     }
@@ -18,8 +18,5 @@ DATABASES = {
 # RAVEN_CONFIG = {
 #     'dsn': ('http://some:hash@your.sentry.site/some_number')}
 
-# TODO: add staging gauges ID here.
-UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
-
-# Add your staging name here. Django 1.6+
+# Add your staging name here
 ALLOWED_HOSTS = ['{{ cookiecutter.package_name }}.staging.lizard.net']

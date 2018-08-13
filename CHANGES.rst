@@ -5,7 +5,10 @@ Changelog for cookiecutter-djangosite-template
 1.3 (unreleased)
 ----------------
 
-- Create the 'buildout' user with an unusable password.
+- Create the 'buildout' user with an unusable password. The name 'buildout'
+  is for historical reasons and does not refer to the package manager used.
+
+- Replaced buildout with pipenv as package manager.
 
 
 1.2 (2018-02-09)

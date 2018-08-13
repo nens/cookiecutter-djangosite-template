@@ -1,25 +1,47 @@
-version: '2'
+version: '3'
 services:
 
   db:
     image: mdillon/postgis
+    environment:
+      POSTGRES_USER: 'nens'
+      POSTGRES_PASSWORD: 'nens'
+      POSTGRES_DB: '{{ cookiecutter.package_name }}'
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
-    environment:
-      POSTGRES_PASSWORD: 'buildout'
-      POSTGRES_USER: 'buildout'
-      POSTGRES_DB: '{{ cookiecutter.package_name }}'
-      PGDATA: '/var/lib/postgresql/data/pgdata'
 
   web:
     build: .
-    command: "bin/django runserver 0.0.0.0:5000"
-    ports:
-      - "5000:5000"
+    user: $UID  # run `export UID` to make this work (or add to your .bashrc)
+    command: "pipenv run python manage.py runserver"
     volumes:
-      - .:/code
+      # do not use .:/code to circumvent a docker issue
+      - ./:/code
+      - $HOME/.cache/pipenv:/pipenv_cache
+      - $SSH_AUTH_SOCK:/tmp/agent.sock
     depends_on:
       - db
+    environment:
+      - DOCKER=True
+      - PYTHONUNBUFFERED=1
+      - PIPENV_VENV_IN_PROJECT=1
+      - PIPENV_CACHE_DIR=/pipenv_cache
+      - SHELL=/bin/bash
+      - SSH_AUTH_SOCK=/tmp/agent.sock
 
 volumes:
   pgdata:
+
+#for local development, you may need to open some ports by adding a
+#docker-compose.override.yml file with host:docker port mappings
+#
+#version: '3'
+#services:
+#
+#  db:
+#    ports:
+#      - "5435:5432"
+#
+#  web:
+#    ports:
+#      - "5000:8000"

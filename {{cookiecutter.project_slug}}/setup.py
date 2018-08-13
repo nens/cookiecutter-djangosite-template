@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '0.1dev'
+version = '0.1.dev0'
 
 long_description = '\n\n'.join([
     open('README.rst').read(),
@@ -9,12 +9,9 @@ long_description = '\n\n'.join([
 
 install_requires = [
     'Django',
-    'django-extensions',
-    'django-nose',
     'gunicorn',
-    'python-memcached',
-    'raven',
-    'werkzeug',
+    'raven',  # for sentry logging
+    'python-memcached',  # for the django memcached backend
     ]
 
 tests_require = [

@@ -1,7 +1,14 @@
 [web]
-todo.your.host.name
+todo.your.production.host.name
 
 [web:vars]
-site_name={{ cookiecutter.project_slug }}.lizard.net
-checkout_name="master"
-buildout_cfg=production.cfg
+site_name = {{ cookiecutter.package_name }}.lizard.net
+project_slug = {{ cookiecutter.project_slug }}
+package_name = {{ cookiecutter.package_name }}
+project_path: "/srv/{% raw %}{{ site_name }}{% endraw %}"
+django_settings = {{ cookiecutter.package_name }}.settings
+supervisor_port = todo.put.port.here
+gunicorn_port = todo.put.port.here
+gunicorn_workers = 3
+gunicorn_max_requests = 500
+celery_concurrency = 4
