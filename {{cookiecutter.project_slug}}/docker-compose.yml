@@ -12,27 +12,25 @@ services:
 
   web:
     build: .
-    user: $UID  # run `export UID` to make this work (or add to your .bashrc)
-    command: "pipenv run python manage.py runserver"
-    volumes:
-      # do not use .:/code to circumvent a docker issue
-      - ./:/code
-      - $HOME/.cache/pipenv:/pipenv_cache
-      - $SSH_AUTH_SOCK:/tmp/agent.sock
+    entrypoint: "pipenv run"
+    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
     environment:
       - DOCKER=True
       - PYTHONUNBUFFERED=1
       - PIPENV_VENV_IN_PROJECT=1
-      - PIPENV_CACHE_DIR=/pipenv_cache
       - SHELL=/bin/bash
-      - SSH_AUTH_SOCK=/tmp/agent.sock
+    volumes:
+      - ./:/code
+      - ~/.netrc:/home/nens/.netrc  # github authentication
+      - ~/.cache/pip:/home/nens/.cache/pip  # shared pip cache
+      - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache
 
 volumes:
   pgdata:
 
-#for local development, you may need to open some ports by adding a
+#for local development, you may want to open some ports by adding a
 #docker-compose.override.yml file with host:docker port mappings
 #
 #version: '3'

@@ -1,11 +1,7 @@
-include *.py
+# Include docs in the root.
 include *.rst
-include .coveragerc
-include development.cfg
-include production.cfg
-include staging.cfg
-recursive-include doc *.py
-recursive-include doc *.rst
-recursive-include etc *.in
-recursive-exclude {{ cookiecutter.package_name }} *.pyc
-exclude {{ cookiecutter.package_name }}/localsettings.py
+# Include everything in our project directory.
+graft {{ cookiecutter.package_name }}
+# Exclude byte-compiled code
+global-exclude __pycache__
+global-exclude *.py[co]

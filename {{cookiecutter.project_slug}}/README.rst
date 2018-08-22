@@ -6,57 +6,85 @@ Introduction
 Usage, etc.
 
 
-Development
------------
+Local development
+-----------------
+
+These instructions assume that ``git``, ``docker``, and ``docker-compose`` are
+installed on your host machine. For server provisioning and deployment,
+``ansible`` is required as well.
 
 This project makes use of Pipenv. If you are new to pipenv, install it and
 study the output of ``pipenv --help``, especially the commands ``pipenv lock``
 and ``pipenv sync``. Or read the `docs <https://docs.pipenv.org/>`_.
 
-We like to keep the project virtual environment inside
-``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
-behaviour, so we need to set the following environment variable:
-``export PIPENV_VENV_IN_PROJECT=1``. If you add that to your ``.bashrc``, you
-don't need to specify it each time.
+If this project depends on private packages, we will need to setup some authentication.
+We do this using a `Personal access token <https://github.com/settings/tokens>`_. Generate one and
+put it in your `$HOME/.netrc` file, as follows::
 
-Install the environment::
+    machine github.com
+    login <github username>
+    password <github token>
 
-    $ pipenv sync --dev
+    machine packages.lizard.net
+    login nens
+    password <packages.lizard.net password>
+
+For security reasons, make it readable only by you::
+
+    $ chmod 600 ~/.netrc
+
+
+Local development
+-----------------
+
+First, clone this repo and make some required directories::
+
+    $ git clone git@github.com:nens/{{ cookiecutter.project_slug }}.git
+    $ cd {{ cookiecutter.project_slug }}
     $ mkdir -p var/static var/media var/log
 
-As we want to avoid port clashes, you have to open a port from your host to
-the database inside your docker. You should specify "host:docker" port mappings
-in  a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``,
-as follows:
+Then build the docker image, providing your user and group ids for correct file
+permissions::
 
-.. code-block:: yaml
+    $ docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g` web
 
-    version: '3'
-    services:
+The entrypoint into the docker is set to `pipenv run`, so that every command is
+executed in the pipenv-managed virtual environment. On the first `docker-compose run`,
+the `.venv` folder will be created automatically inside your project directory::
 
-      db:
-        ports:
-          - "5435:5432"  # the first one should the one in the localsettings
+    $ docker-compose run --rm bash
 
-Also, set the same port in your local django settings
-``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
+If this is a first time use, or if you want to bump package versions, generate
+a (new) `Pipfile.lock`::
 
-.. code-block:: python
+    $ pipenv lock
 
-    DATABASES['default']['HOST'] = 'localhost'
-    DATABASES['default']['PORT'] = '5435'  # match this one with the docker-compose file
+Then install the packages (including dev packages) listed in `Pipfile.lock`::
 
-Start the database::
+    $ pipenv sync --dev
 
-    $ docker-compose up db
+Run migrations::
 
-Migrate the database::
+    $ python manage.py migrate
 
-    $ pipenv run python manage.py migrate
+Then exit the docker shell (Ctrl + D)
 
-Run the webserver using your favourite IDE, or from the commandline::
+At this point, you may want to test your installation::
 
-    $ pipenv run python manage.py runserver 0.0.0.0:5000
+    $ docker-compose run --rm web python manage.py test
+
+Or start working with {{ cookiecutter.project_slug }} right away::
+
+    $ docker-compose up
+
+Now that Django is up and running, you may want to access the website from the
+browser on your host machine. For this, you will need to open a port by generating
+a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``. Checkout
+``{{ cookiecutter.package_name }}/docker-compose.yml`` for an example.
+
+To stop all running containers without removing them, do this::
+
+    $ docker-compose stop
 
 
 Installation on the server
@@ -64,30 +92,28 @@ Installation on the server
 
 The ansible config and playbook is in the ``ansible/``
 subdir. ``ansible/staging_inventory`` and ``ansible/production_inventory`` are
-the two inventory files. Adjust variables (like checkout name and server name)
+the two inventory files. Adjust variables (server name and gunicorn port)
 in there.
 
 The ``ansible/provision.yml`` playbook does the root-level stuff like
 installing debian packages and creating a ``/srv/*`` directory. You should
-only need to run this when there's a new debian dependency, for instance. It
+only need to run this when there is a new debian dependency. It
 also adds a couple of persons' ssh key to the ``~/.ssh/authorized_keys`` file
 of the buildout user, which the deploy script uses to log you in directly as
 user buildout.
 
 The ``ansible/deploy.yml`` playbook is for the regular releases including git
-checkout, bin/buildout, migration and supervisor restart.
+checkout, pipenv sync, migration and supervisor restart.
 
-General usage::
+Deploy command::
 
   $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml
 
-Only needed for the initial install or when the nginx config has been changed
-and so::
+If you don't have an ssh key set up, add ``-k`` to log in.
 
-  $ ansible-playbook -i ansible/staging_inventory ansible/provision.yml
+Provision command::
 
-If you don't have an ssh key set up, add ``-k`` to log in. ``-K`` asks for a
-sudo password if it isn't set up as passwordless.
+  $ ansible-playbook -K -i ansible/staging_inventory ansible/provision.yml
 
 
 Development with Docker

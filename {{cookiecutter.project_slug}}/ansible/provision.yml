@@ -7,16 +7,16 @@
   become: yes
   tasks:
 
-    - name: Add user "buildout" and set an unusable password.
+    - name: Add build user and set an unusable password.
       user:
-        name: buildout
+        name: "{{ build_user }}"
         password: '*'
         state: present
         shell: "/bin/bash"
 
-    - name: "Add maintainers' ssh keys so they can log in as user buildout."
+    - name: "Add maintainers' ssh keys so they can log in as the build user."
       authorized_key:
-        user: buildout
+        user: "{{ build_user }}"
         key: https://github.com/{{ item }}.keys
       with_items:
         - byrman
@@ -33,24 +33,31 @@
         - memcached
         - nginx
         - libpq-dev       # for psycopg2 (postgres backend)
-        # - libgdal-dev   # if you need pygdal
-        # - gdal-bin      # if you need gdal command line
-        # - python-gdal   # if you need gdal command line python scripts
+        # - libgdal-dev \       uncomment if the project requires pygdal
+        # - libfreetype6-dev \  uncomment if the project requires matplotlib
 
-    - name: Upgrade setuptools, pip, and pipenv.
-      pip: name={{ item }} extra_args="--upgrade"
-      with_items:
-        - setuptools
-        - pip
-        - pipenv
+    - name: Upgrade setuptools
+      pip:
+        name: setuptools
+        state: latest
 
-    - name: Create dir inside /srv for the checkout.
+    - name: Install pip
+      pip:
+        name: pip
+        version: 10.0.1
+
+    - name: Install pipenv
+      pip:
+        name: pipenv
+        version: 2018.5.18
+
+    - name: Create the project path.
       file:
-        path: {{ project_path }}
+        path: "{{ project_path }}"
         state: directory
         mode: 0755
-        owner: buildout
-        group: buildout
+        owner: "{{ build_user }}"
+        group: "{{ build_user }}"
 
     - name: "Look if nginx config already exists (you'll need to run deploy first!)"
       stat: path={{ project_path }}/etc/{{ site_name }}.nginx.conf
