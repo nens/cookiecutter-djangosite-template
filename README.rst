@@ -17,8 +17,36 @@ Run the following command and answer the questions::
 
   $ cookiecutter https://github.com/nens/cookiecutter-djangosite-template
 
-Optionally add dependencies to the ``setup.py``. Then follow the installation
-instructions inside the newly generated repository.
+Optionally add dependencies to the ``setup.py``, considering the remarks listed
+below. Then follow the installation instructions, with the following addition after
+building the docker::
+
+  (docker) $ pipenv --python 3.6
+  (docker) $ pipenv install -e .
+  (docker) $ pipenv install --dev nose coverage zest.releaser flake8
+
+Add and commit the newly generated ``Pipfile`` and ``Pipfile.lock``.
+
+
+Authentication
+--------------
+
+All dependencies are pulled from https://packages.lizard.net. Some of the dependencies
+on this package index are password-protected, which means that you will need to
+authenticate. Just add the packages.lizard.net user / password to your ``~/.netrc``
+file to authenticate.
+
+If a dependency is only available via git, you may add it using::
+
+  $ pipenv install -e git+https://github.com/nens/<project-name>.git@master#egg=<package_name>
+
+Note that this will result in much slower deploys. Also note that we use HTTPS,
+not SSH. Authentication is done (again) via the ``~/.netrc``,
+using a github `Personal access token <https://github.com/settings/tokens>`_. See
+the project README for an example ``.netrc`` file.
+
+Specific dependency remarks
+---------------------------
 
 If you require matplotlib in your project:
 

@@ -61,8 +61,7 @@ docker (e.g. mapnik)::
 
     (docker) $ pipenv --python 3.6 [--site-packages]
 
-If this is a first time use, or if you want to bump package versions, generate
-a (new) `Pipfile.lock`::
+If you want to bump package versions, regenerate the `Pipfile.lock`::
 
     (docker) $ pipenv lock
 
