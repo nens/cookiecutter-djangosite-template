@@ -52,20 +52,27 @@ The entrypoint into the docker is set to `pipenv run`, so that every command is
 executed in the pipenv-managed virtual environment. On the first `docker-compose run`,
 the `.venv` folder will be created automatically inside your project directory::
 
-    $ docker-compose run --rm bash
+    $ docker-compose run --rm web bash
+
+If you happened to have created the virtual environment while outside the
+docker, recreate it inside the docker. Optionally, add the `--site-packages` switch
+to be able to import python packages that you installed with apt inside the
+docker (e.g. mapnik)::
+
+    (docker) $ pipenv --python 3.6 [--site-packages]
 
 If this is a first time use, or if you want to bump package versions, generate
 a (new) `Pipfile.lock`::
 
-    $ pipenv lock
+    (docker) $ pipenv lock
 
 Then install the packages (including dev packages) listed in `Pipfile.lock`::
 
-    $ pipenv sync --dev
+    (docker) $ pipenv sync --dev
 
 Run migrations::
 
-    $ python manage.py migrate
+    (docker) $ python manage.py migrate
 
 Then exit the docker shell (Ctrl + D)
 
@@ -116,41 +123,33 @@ Provision command::
   $ ansible-playbook -K -i ansible/staging_inventory ansible/provision.yml
 
 
-Development with Docker
+Development outside the Docker
 -----------------------
 
-There's a docker file to make it easy for you to get started with the project
-and to run the tests. You can edit files in the current directory and they'll
-be picked up by docker right away.
+If you have the same OS on your local machine as used in the ``Dockerfile``, you
+may want to run your webserver outside a docker. You will need to install pipenv
+on your machine::
 
-The docker setup is also used by ``Jenkinsfile``, which means that our jenkins
-instance will automatically pick it up.
+    $ pip install --upgrade setuptools
+    $ pip install pip==10.0.1 pipenv==2018.5.18
 
-As we want to avoid port clashes, you have to open a ports from your docker
-webserver to your host system. You should specify "host:docker" port mappings in
-a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``, as follows:
+Also, make sure you have the debian packages as specified in the ``Dockerfile``.
 
-.. code-block:: yaml
+Open up a port to the (still dockerized) db by adding a ``{{ cookiecutter.package_name }}/docker-compose.override.yml`` file.
+Checkout  ``{{ cookiecutter.package_name }}/docker-compose.yml`` for an example.
 
-    version: '3'
-    services:
+Also, setup the same port in your local django settings
+``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
 
-      db:
-        ports:
-          - "5000:8000"  # pick your favourite port for access from your local browser
+.. code-block:: python
 
+    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES['default']['PORT'] = '5435'  # match this one with your docker-compose.override.yml
 
-First-time usage::
+Then run the following commands::
 
-    $ export UID  # or add this to your .bashrc
-    $ docker-compose build
-    $ docker-compose run --rm web pipenv install --deploy --dev
-    $ docker-compose run --rm web pipenv run python manage.py migrate
-    $ docker-compose up
-
-The site will now run on http://localhost:5000 (or whatever port you picked)
-
-Running the tests::
-
-    $ docker-compose run --rm web pipenv run python manage.py test
-
+    $ PIPENV_VENV_IN_PROJECT=1 pipenv --three
+    $ pipenv sync --dev
+    $ docker-compose up db
+    $ pipenv run python manage.py migrate
+    $ pipenv run python manage.py runserver 0.0.0.0:5000

@@ -11,6 +11,7 @@ install_requires = [
     'Django',
     'gunicorn',
     'raven',  # for sentry logging
+    'psycopg2',  # the postgres backend
     'python-memcached',  # for the django memcached backend
     ]
 

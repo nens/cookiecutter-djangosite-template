@@ -8,27 +8,40 @@ can create a fresh Django site project. It replaces the old "nensskel" tool.
 Using this cookiecutter template
 --------------------------------
 
-Install/upgrade cookiecutter and pipenv::
+Install/upgrade cookiecutter::
 
-  $ pip install cookiecutter pipenv --upgrade
+  $ pip install --upgrade --user cookiecutter
 
 
 Run the following command and answer the questions::
 
   $ cookiecutter https://github.com/nens/cookiecutter-djangosite-template
 
-Optionally add dependencies to the ``setup.py``. Then generate a lockfile by
-running::
+Optionally add dependencies to the ``setup.py``. Then follow the installation
+instructions inside the newly generated repository.
 
-  $ pipenv lock
+If you require matplotlib in your project:
 
-And commit the resulting ``Pipfile.lock``.
+ - uncomment ``libfreetype6-dev`` in both ``ansible/provision.yml`` and ``Dockerfile``
+ - add ``matplotlib`` to your ``setup.py``
 
-NB: If you require GDAL in your project, add ``pygdal`` as as dependency to the
-``setup.py`` and pin ``pygdal`` in the ``Pipfile`` to a version that matches
-the server OS version (for Ubuntu 16: 1.11.3) by calling::
 
-  $ pipenv install pygdal==1.11.3.*
+If you require GDAL in your project:
+
+ - uncomment ``libgdal-dev`` in both ``ansible/provision.yml`` and ``Dockerfile``
+ - do not add ``gdal`` as a dependency to the ``setup.py``
+ - never import gdal with ``import gdal``, use ``from osgeo import gdal`` instead
+ - pin ``pygdal`` in the ``Pipfile`` to a version that matches
+   the server OS version (Ubuntu 16: 1.11.3; Ubuntu 18: 2.2.3) by calling::
+
+  $ pipenv install pygdal==2.2.3.*
+
+
+If you require mapnik in your project:
+
+ - add ``python3-mapnik`` to the apt install in ``ansible/provision.yml`` and in ``Dockerfile``
+ - do not add ``mapnik`` as a dependency to the ``setup.py``
+ - initialize the pipenv with ``pipenv --site-packages`` (see project README)
 
 
 Development of this template itself
