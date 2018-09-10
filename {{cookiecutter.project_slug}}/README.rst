@@ -127,7 +127,8 @@ Development outside the Docker
 
 If you have the same OS on your local machine as used in the ``Dockerfile``, you
 may want to run your webserver outside a docker. You will need to install pipenv
-on your machine::
+on your machine (note the pinning because of
+https://github.com/pypa/pipenv/issues/2666)::
 
     $ pip install --upgrade setuptools
     $ pip install pip==10.0.1 pipenv==2018.5.18

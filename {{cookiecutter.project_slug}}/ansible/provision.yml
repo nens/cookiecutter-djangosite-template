@@ -41,6 +41,7 @@
         name: setuptools
         state: latest
 
+    # Note the pinning because of https://github.com/pypa/pipenv/issues/2666
     - name: Install pip
       pip:
         name: pip
