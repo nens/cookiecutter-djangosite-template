@@ -6,8 +6,8 @@ Introduction
 Usage, etc.
 
 
-Local development
------------------
+Local setup
+-----------
 
 These instructions assume that ``git``, ``docker``, and ``docker-compose`` are
 installed on your host machine. For server provisioning and deployment,
@@ -27,12 +27,19 @@ put it in your `$HOME/.netrc` file, as follows::
 
     machine packages.lizard.net
     login nens
-    password <packages.lizard.net password>
+    password <packages.lizard.net password (check the internalpackages repo)>
 
 For security reasons, make it readable only by you::
 
     $ chmod 600 ~/.netrc
 
+The docker-compose file expects the following folders to exist:
+
+ - ``~/.cache/pip``
+ - ``~/.cache/pipenv``
+
+Check if they exist and if you are the owner. If they do not exist, create them
+with ``mkdir``, and if they are not owned by you, use ``sudo chown``.
 
 Local development
 -----------------
@@ -61,10 +68,6 @@ docker (e.g. mapnik)::
 
     (docker) $ pipenv --python 3.6 [--site-packages]
 
-If you want to bump package versions, regenerate the `Pipfile.lock`::
-
-    (docker) $ pipenv lock
-
 Then install the packages (including dev packages) listed in `Pipfile.lock`::
 
     (docker) $ pipenv sync --dev
@@ -91,6 +94,13 @@ a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``. Checkou
 To stop all running containers without removing them, do this::
 
     $ docker-compose stop
+
+To update package versions (taking into account constraints in ``Pipfile``)::
+
+    $ docker-compose run --rm web pipenv lock
+
+And commit the newly generated ``Pipfile.lock``. If you make any change to
+``Pipfile`` or ``setup.py``, you have to regenerate the lockfile.
 
 
 Installation on the server
