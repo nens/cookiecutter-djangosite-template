@@ -13,7 +13,7 @@
     - name: Checkout correct version from github.
       git:
         accept_hostkey: yes
-        repo: "ssh://git@github.com/nens/{{ project_name }}.git"
+        repo: "https://github.com/nens/{{ project_slug }}.git"
         dest: "{{ project_path }}"
         version: "{{ checkout_name }}"
 
@@ -38,7 +38,7 @@
         creates: "{{ project_path }}/.venv"
 
     - name: "Deploy (look at var/log/pipenv.log if something goes fishy)"
-      shell: pipenv sync --verbose > var/log/pipenv.log 2>&1
+      shell: pipenv install --deploy --verbose > var/log/pipenv.log 2>&1
       args:
         chdir: "{{ project_path }}"
 

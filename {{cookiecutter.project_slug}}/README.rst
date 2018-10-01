@@ -123,7 +123,7 @@ checkout, pipenv sync, migration and supervisor restart.
 
 Deploy command::
 
-  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml --extra-vars "checkout_name=<version>"
 
 If you don't have an ssh key set up, add ``-k`` to log in.
 
