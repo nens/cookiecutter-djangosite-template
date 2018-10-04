@@ -23,13 +23,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 # for writing Dockerfiles". https://docs.docker.com/engine/userguide/↵
 # eng-image/dockerfile_best-practices/
 #
-# Installing GDAL python bindings via pipenv requires libgdal-dev.
-#
-# Curl and xz-utils are used to install Node.js, see below.
-#
-# Checking out repositories via mr.developer requires git. Git is also
-# needed for releases via zest.releaser.
-#
 # Installing psycopg2 via pip requires libpq-dev. The latter is also a
 # dependency of libgdal-dev, but explicit is better than implicit.
 RUN apt-get update && apt-get install -y \
