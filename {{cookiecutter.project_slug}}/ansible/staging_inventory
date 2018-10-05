@@ -12,3 +12,4 @@ django_settings = "{% raw %}{{ package_name }}{% endraw %}".stagingsettings
 supervisor_port = todo.put.port.here
 gunicorn_port = todo.put.port.here
 gunicorn_workers = 3
+gunicorn_max_requests = 50000
