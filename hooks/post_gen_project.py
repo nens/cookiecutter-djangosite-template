@@ -1,5 +1,4 @@
 import random
-import string
 import os
 import re
 
@@ -22,10 +21,8 @@ def find_settings():
 
 def secret_gen():
     """Generates 50 character secret."""
-    return ''.join(
-        random.choice(string.printable[:94].replace('"', '')) for _ in
-        range(50)
-    )
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    return ''.join(random.choice(chars) for _ in range(50))
 
 
 def insert_secret_in_settings():
