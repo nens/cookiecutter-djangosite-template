@@ -9,5 +9,6 @@
         "ansible/templates/*.j2",
         "ansible/deploy.yml",
         "ansible/provision.yml"
-    ]
+    ],
+    "celery": ["yes", "no"]
 }
