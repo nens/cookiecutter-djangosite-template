@@ -21,10 +21,10 @@ DATABASES = {
 # Add your staging name here
 ALLOWED_HOSTS = ['{{ cookiecutter.package_name }}.staging.lizard.net']
 
-
 {% if cookiecutter.celery == "yes" %}
 CELERY_RESULT_BACKEND = 'django-db'
 
 INSTALLED_APPS += (
     'django_celery_results',
-){% endif %}
+)
+{% endif %}

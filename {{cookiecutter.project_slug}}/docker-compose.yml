@@ -17,9 +17,9 @@ services:
     depends_on:
       - db
       - rabbitmq
-{% if cookiecutter.celery == "yes" %}      - celery
+{% if cookiecutter.celery == "yes" %}      .
+      - celery
 {% endif %}    environment:
-      - C_FORCE_ROOT=1
       - DOCKER=True
       - PYTHONUNBUFFERED=1
       - PIPENV_VENV_IN_PROJECT=1
@@ -30,7 +30,8 @@ services:
       - ~/.cache/pip:/home/nens/.cache/pip  # shared pip cache
       - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache
 
-{% if cookiecutter.celery == "yes" %}  celery:
+{% if cookiecutter.celery == "yes" %}
+celery:
     build: .
     entrypoint: "pipenv run"
     command: celery worker --app={{ cookiecutter.package_name }} --concurrency=1 --pidfile=var/celery.pid --loglevel=info --task-events
@@ -38,7 +39,6 @@ services:
       - db
       - rabbitmq
     environment:
-      - C_FORCE_ROOT=1
       - DOCKER=True
       - PYTHONUNBUFFERED=1
       - PIPENV_VENV_IN_PROJECT=1
@@ -47,7 +47,8 @@ services:
       - ./:/code
       - ~/.netrc:/home/nens/.netrc  # github authentication
       - ~/.cache/pip:/home/nens/.cache/pip  # shared pip cache
-      - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache{% endif %}
+      - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache
+{% endif %}
 
 volumes:
   pgdata:

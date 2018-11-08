@@ -1,8 +1,10 @@
 [web]
 todo.your.production.host.name
 
-{% if cookiecutter.celery == "yes" %}[task]
-todo.your.production.host.name{% endif %}
+{% if cookiecutter.celery == "yes" %}
+[task]
+todo.your.production.host.name
+{% endif %}
 
 [web:vars]
 build_user = buildout
@@ -16,4 +18,12 @@ supervisor_port = todo.put.port.here
 gunicorn_port = todo.put.port.here
 gunicorn_workers = 3
 gunicorn_max_requests = 50000
-{% if cookiecutter.celery == "yes" %}celery_concurrency = 1{% endif %}
+supervisor_programs: [
+    'gunicorn',
+    {% if cookiecutter.celery == "yes" %}
+    'celery'
+    {% endif %}
+]
+{% if cookiecutter.celery == "yes" %}
+celery_concurrency = 1
+{% endif %}
