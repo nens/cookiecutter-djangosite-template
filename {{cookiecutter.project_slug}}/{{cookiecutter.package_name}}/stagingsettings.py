@@ -7,7 +7,7 @@ DATABASES = {
     'default': {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'USER': '{{ cookiecutter.package_name }}',
+        'USER': 'todo.dbuser',
         'PASSWORD': 'todo.dbpassword',
         'HOST': 'todo.dbhost',
         'PORT': '5432',
@@ -20,11 +20,3 @@ DATABASES = {
 
 # Add your staging name here
 ALLOWED_HOSTS = ['{{ cookiecutter.package_name }}.staging.lizard.net']
-
-{% if cookiecutter.celery == "yes" %}
-CELERY_RESULT_BACKEND = 'django-db'
-
-INSTALLED_APPS += (
-    'django_celery_results',
-)
-{% endif %}

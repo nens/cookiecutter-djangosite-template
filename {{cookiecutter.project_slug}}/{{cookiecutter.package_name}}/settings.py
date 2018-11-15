@@ -90,9 +90,9 @@ DATABASES = {
     'default': {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'USER': 'nens',
-        'PASSWORD': 'nens',
-        'HOST': 'db',
+        'USER': 'todo.dbuser',
+        'PASSWORD': 'todo.dbpassword',
+        'HOST': 'todo.dbport',
         'PORT': '5432',
         }
     }
@@ -195,6 +195,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'gunicorn',
 )
+
+{% if cookiecutter.celery == "yes" %}
+CELERY_RESULT_BACKEND = 'django-db'
+
+INSTALLED_APPS += (
+    'django_celery_results',
+)
+{% endif %}
 
 # TODO: Put your real url here to configure Sentry.
 # RAVEN_CONFIG = {
