@@ -12,14 +12,13 @@
 
     - name: Checkout correct version from github.
       git:
-        accept_hostkey: yes
         repo: "https://github.com/nens/{{ project_slug }}.git"
         dest: "{{ project_path }}"
         version: "{{ checkout_name }}"
 
     - name: Create var dirs if not available.
       file:
-        path: {{ project_path }}/{{ item }}
+        path: "{{ project_path }}/{{ item }}"
         mode: 0755
         state: directory
       with_items:

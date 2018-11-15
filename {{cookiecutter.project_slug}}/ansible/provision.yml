@@ -66,7 +66,7 @@
 
     - name: Symlink nginx config, when available.
       file:
-        src: {{ project_path }}/etc/{{ site_name }}.nginx.conf
+        src: "{{ project_path }}/etc/{{ site_name }}.nginx.conf"
         dest: /etc/nginx/sites-available/{{ site_name }}.nginx.conf
         state: link
       when: nginx_conffile.stat.exists

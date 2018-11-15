@@ -1,15 +1,29 @@
 [web]
 todo.your.production.host.name
 
+{% if cookiecutter.celery == "yes" %}
+[task]
+todo.your.production.host.name
+{% endif %}
+
 [web:vars]
 build_user = buildout
 project_slug = {{ cookiecutter.project_slug }}
 package_name = {{ cookiecutter.package_name }}
 site_name = "{% raw %}{{ package_name }}{% endraw %}.lizard.net"
 checkout_name = please-provide-checkout-name-in-the-extra-vars
-project_path: "/srv/{% raw %}{{ site_name }}{% endraw %}"
+project_path = "/srv/{% raw %}{{ site_name }}{% endraw %}"
 django_settings = "{% raw %}{{ package_name }}{% endraw %}".settings
 supervisor_port = todo.put.port.here
 gunicorn_port = todo.put.port.here
 gunicorn_workers = 3
 gunicorn_max_requests = 50000
+supervisor_programs: [
+    'gunicorn',
+    {% if cookiecutter.celery == "yes" %}
+    'celery'
+    {% endif %}
+]
+{% if cookiecutter.celery == "yes" %}
+celery_concurrency = 1
+{% endif %}

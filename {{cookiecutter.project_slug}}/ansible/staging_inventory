@@ -7,9 +7,18 @@ project_slug = {{ cookiecutter.project_slug }}
 package_name = {{ cookiecutter.package_name }}
 site_name = "{% raw %}{{ package_name }}{% endraw %}.staging.lizard.net"
 checkout_name = master
-project_path: "/srv/{% raw %}{{ site_name }}{% endraw %}"
-django_settings = "{% raw %}{{ package_name }}{% endraw %}".stagingsettings
+project_path = "/srv/{% raw %}{{ site_name }}{% endraw %}"
+django_settings = "{% raw %}{{ package_name }}{% endraw %}.stagingsettings"
 supervisor_port = todo.put.port.here
 gunicorn_port = todo.put.port.here
 gunicorn_workers = 3
 gunicorn_max_requests = 50000
+supervisor_programs: [
+    'gunicorn',
+    {% if cookiecutter.celery == "yes" %}
+    'celery'
+    {% endif %}
+]
+{% if cookiecutter.celery == "yes" %}
+celery_concurrency = 1
+{% endif %}
