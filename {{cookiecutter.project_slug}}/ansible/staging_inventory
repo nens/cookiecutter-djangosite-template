@@ -11,18 +11,15 @@ all:
     gunicorn_port: todo.put.port.here
     gunicorn_workers: 3
     gunicorn_max_requests: 50000
-{% if cookiecutter.celery == "yes" %}
-    celery_concurrency: 1
-{% endif %}    supervisor_programs: [
+{% if cookiecutter.celery == "yes" %}    celery_concurrency: 1{% endif %}
+    supervisor_programs: [
         'gunicorn',
-{% if cookiecutter.celery == "yes" %}
-        'celery'
-{% endif %}    ]
+{% if cookiecutter.celery == "yes" %}        'celery'{% endif %}
+    ]
 
 web:
   hosts:
     todo.your.staging.host.name:
-
 {% if cookiecutter.celery == "yes" %}
 task:
   hosts:

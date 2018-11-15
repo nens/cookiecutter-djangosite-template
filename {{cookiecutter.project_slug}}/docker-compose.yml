@@ -16,28 +16,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
-      - rabbitmq
-{% if cookiecutter.celery == "yes" %}      .
-      - celery
-{% endif %}    environment:
-      - DOCKER=True
-      - PYTHONUNBUFFERED=1
-      - PIPENV_VENV_IN_PROJECT=1
-      - SHELL=/bin/bash
-    volumes:
-      - ./:/code
-      - ~/.netrc:/home/nens/.netrc  # github authentication
-      - ~/.cache/pip:/home/nens/.cache/pip  # shared pip cache
-      - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache
-
-{% if cookiecutter.celery == "yes" %}
-celery:
-    build: .
-    entrypoint: "pipenv run"
-    command: celery worker --app={{ cookiecutter.package_name }} --concurrency=1 --pidfile=var/celery.pid --loglevel=info --task-events
-    depends_on:
-      - db
-      - rabbitmq
+{% if cookiecutter.celery == "yes" %}      - rabbit{% endif %}
+{% if cookiecutter.celery == "yes" %}      - worker{% endif %}
     environment:
       - DOCKER=True
       - PYTHONUNBUFFERED=1
@@ -46,8 +26,28 @@ celery:
     volumes:
       - ./:/code
       - ~/.netrc:/home/nens/.netrc  # github authentication
-      - ~/.cache/pip:/home/nens/.cache/pip  # shared pip cache
-      - ~/.cache/pipenv:/home/nens/.cache/pipenv  # shared pipenv cache
+      - ~/.cache:/home/nens/.cache  # shared cache
+
+{% if cookiecutter.celery == "yes" %}
+  worker:
+    build: .
+    entrypoint: "pipenv run"
+    command: celery worker --app={{ cookiecutter.package_name }} --concurrency=1 --pidfile=var/celery.pid --loglevel=info --task-events
+    depends_on:
+      - db
+      - rabbit
+    environment:
+      - DOCKER=True
+      - PYTHONUNBUFFERED=1
+      - PIPENV_VENV_IN_PROJECT=1
+      - SHELL=/bin/bash
+    volumes:
+      - ./:/code
+      - ~/.netrc:/home/nens/.netrc  # github authentication
+      - ~/.cache:/home/nens/.cache  # shared cache
+
+  rabbit:
+    image: rabbitmq
 {% endif %}
 
 volumes:
