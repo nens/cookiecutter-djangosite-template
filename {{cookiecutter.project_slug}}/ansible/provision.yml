@@ -70,7 +70,7 @@
         owner: "{{ build_user }}"
         group: "{{ build_user }}"
 
-    - name: Check whether nginx config already exists
+    - name: Check whether nginx config exists
       stat: path={{ project_path }}/etc/{{ site_name }}.nginx.conf
       register: nginx_conffile
 
@@ -94,3 +94,4 @@
         owner: root  # user, group and mode are required by logrotate
         group: root
         mode: 0644
+      when: nginx_conffile.stat.exists

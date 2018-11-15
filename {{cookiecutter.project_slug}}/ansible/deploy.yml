@@ -56,10 +56,18 @@
         - { src: "templates/supervisord.conf.j2", dest: "{{ project_path }}/etc/{{ site_name }}.supervisord.conf" }
         - { src: "templates/nginx.conf.j2", dest: "{{ project_path }}/etc/{{ site_name }}.nginx.conf" }
 
+    - name: Recreate nginx config file.
+      template:
+        src: "templates/nginx.conf.j2"
+        dest: "{{ project_path }}/etc/{{ site_name }}.nginx.conf"
+        mode: 0755
+      when: inventory_hostname in groups['web']
+
     - name: Run migrations.
       shell: pipenv run python manage.py migrate --noinput
       args:
         chdir: "{{ project_path }}"
+      run_once: true
 
     - name: Collect static files.
       shell: pipenv run python manage.py collectstatic --noinput --clear
@@ -72,6 +80,10 @@
         user: "{{ build_user }}"
         special_time: reboot
         job: "supervisord -c {{ project_path }}/etc/{{ site_name }}.supervisord.conf"
+
+    - name: Stop nginx
+      shell: sh -c "sudo service nginx stop"
+      when: inventory_hostname in groups['web']
 
     - name: Shut down supervisor.
       action: "shell supervisorctl -c etc/{{ site_name }}.supervisord.conf shutdown"
@@ -88,3 +100,7 @@
       action: "shell supervisord -c etc/{{ site_name }}.supervisord.conf"
       args:
         chdir: "{{ project_path }}"
+
+    - name: Start nginx
+      shell: sh -c "sudo service nginx start"
+      when: inventory_hostname in groups['web']

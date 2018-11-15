@@ -12,6 +12,7 @@ services:
 
   web:
     build: .
+{% if cookiecutter.celery == "yes" %}    image: {{ cookiecutter.project_slug }}{% endif %}
     entrypoint: "pipenv run"
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
@@ -30,7 +31,7 @@ services:
 
 {% if cookiecutter.celery == "yes" %}
   worker:
-    build: .
+    image: {{ cookiecutter.project_slug }}
     entrypoint: "pipenv run"
     command: celery worker --app={{ cookiecutter.package_name }} --concurrency=1 --pidfile=var/celery.pid --loglevel=info --task-events
     depends_on:
