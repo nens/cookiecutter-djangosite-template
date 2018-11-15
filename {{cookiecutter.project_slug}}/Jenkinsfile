@@ -14,7 +14,7 @@ pipeline {
             steps {
                 sh "docker-compose down --volumes"
                 sh "docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g` web"
-                sh "docker-compose run --rm --volume $HOME/.netrc:/home/nens/.netrc --volume $HOME/.cache/pip:/home/nens/.cache/pip --volume $HOME/.cache/pipenv:/home/nens/.cache/pipenv web pipenv sync --dev"
+                sh "docker-compose run --rm --volume $HOME/.netrc:/home/nens/.netrc --volume $HOME/.cache:/home/nens/.cache web pipenv install --deploy --dev"
                 sh "docker-compose run --rm web pip freeze"
             }
         }

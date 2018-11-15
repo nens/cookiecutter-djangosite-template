@@ -29,9 +29,9 @@
         - "var/media"
 
     - name: Create the pipenv if not available
-      shell: pipenv
+      shell: pipenv --three
       environment:
-        PIPENV_VENV_IN_PROJECT: 1  # pipenv install --local is coming and will replace this
+        PIPENV_VENV_IN_PROJECT: 1
       args:
         chdir: "{{ project_path}}"
         creates: "{{ project_path }}/.venv"

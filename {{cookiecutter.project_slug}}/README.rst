@@ -119,7 +119,7 @@ of the buildout user, which the deploy script uses to log you in directly as
 user buildout.
 
 The ``ansible/deploy.yml`` playbook is for the regular releases including git
-checkout, pipenv sync, migration and supervisor restart.
+checkout, pipenv sync, migration, supervisor restart, and nginx restart.
 
 Deploy command::
 

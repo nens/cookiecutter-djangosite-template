@@ -39,8 +39,7 @@ RUN apt-get update && apt-get install -y \
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
-# Note the pinning because of https://github.com/pypa/pipenv/issues/2666
-RUN pip3 install --upgrade setuptools && pip3 install pip==10.0.1 pipenv==2018.5.18
+RUN pip3 install --upgrade setuptools pip pipenv
 
 VOLUME /code
 WORKDIR /code
