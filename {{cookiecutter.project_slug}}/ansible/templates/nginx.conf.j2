@@ -4,16 +4,16 @@ server {
     server_name {{ site_name }};
 
     keepalive_timeout 5;
-    access_log /srv/{{ site_name }}/var/log/access.log;
-    error_log /srv/{{ site_name }}/var/log/error.log;
+    access_log {{ project_path }}/var/log/access.log;
+    error_log {{ project_path }}/var/log/error.log;
 
     location /static_media/ {
-       alias /srv/{{ site_name }}/var/static/;
+       alias {{ project_path }}/var/static/;
        expires max;
     }
 
     location /media/ {
-       alias /srv/{{ site_name }}/var/media/;
+       alias {{ project_path }}/var/media/;
        expires 24h;
     }
 

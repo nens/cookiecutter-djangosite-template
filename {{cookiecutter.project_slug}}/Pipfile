@@ -4,13 +4,15 @@ verify_ssl = true
 name = "nens"
 
 [dev-packages]
-coverage = "*"
-nose = "*"
-"zest.releaser" = "*"
 "flake8" = "*"
+ipdb = "*"
+ipython = "*"
 
 [packages]
-{{ cookiecutter.project_slug }} = {path = ".", editable = true}
+# === This package ===
+# Should always be installed like this, else setup.py is bypassed (and we would
+# have to modify PYTHONPATH at several points in the project)
+"{{ cookiecutter.project_slug }}" = {path = ".", editable = true}
 
 [requires]
-python_version = "3.5"
+python_version = "3.6"

@@ -10,6 +10,3 @@ downloads/
 .idea
 .venv
 var/
-
-# this is a library, so we ignore Pipfile.lock
-Pipfile.lock

@@ -6,84 +6,101 @@
 ---
 - name: deploy new version of the project to the server
   hosts: web
-  remote_user: buildout
+  remote_user: "{{ build_user }}"
 
   tasks:
 
     - name: Checkout correct version from github.
       git:
-        accept_hostkey: yes
-        dest: {{ project_path }}
-        repo: ssh://git@github.com/nens/{{ project_name }}.git
+        repo: "https://github.com/nens/{{ project_slug }}.git"
+        dest: "{{ project_path }}"
         version: "{{ checkout_name }}"
 
     - name: Create var dirs if not available.
       file:
-        path: {{ project_path }}/{{ item }}
-        owner: buildout
-        group: buildout
+        path: "{{ project_path }}/{{ item }}"
         mode: 0755
         state: directory
       with_items:
-        - etc
-        - var
-        - var/static
-        - var/log
-        - var/media
+        - "etc"
+        - "var"
+        - "var/static"
+        - "var/log"
+        - "var/media"
+
+    - name: Create the pipenv if not available
+      shell: pipenv --three
+      environment:
+        PIPENV_VENV_IN_PROJECT: 1
+      args:
+        chdir: "{{ project_path}}"
+        creates: "{{ project_path }}/.venv"
 
     - name: "Deploy (look at var/log/pipenv.log if something goes fishy)"
-      shell: pipenv sync --verbose > var/log/pipenv.log 2>&1
-      environment:
-        PIPENV_VENV_IN_PROJECT: 1  # pipenv install --local is coming and will replace this
+      shell: pipenv install --deploy --verbose > var/log/pipenv.log 2>&1
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
 
     - name: Clean unused packages.
       shell: pipenv clean
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
 
     - name: Recreate config files from templates.
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-        owner: buildout
-        group: buildout
         mode: 0755
       loop:
         - { src: "templates/env.j2", dest: "{{ project_path }}/.env" }
         - { src: "templates/supervisord.conf.j2", dest: "{{ project_path }}/etc/{{ site_name }}.supervisord.conf" }
         - { src: "templates/nginx.conf.j2", dest: "{{ project_path }}/etc/{{ site_name }}.nginx.conf" }
 
+    - name: Recreate nginx config file.
+      template:
+        src: "templates/nginx.conf.j2"
+        dest: "{{ project_path }}/etc/{{ site_name }}.nginx.conf"
+        mode: 0755
+      when: inventory_hostname in groups['web']
+
     - name: Run migrations.
       shell: pipenv run python manage.py migrate --noinput
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
+      run_once: true
 
     - name: Collect static files.
       shell: pipenv run python manage.py collectstatic --noinput --clear
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
 
     - name: Add cronjob that starts supervisord at reboot.
       cron:
         name: "Restart supervisor for {{ site_name }}"
-        user: buildout
+        user: "{{ build_user }}"
         special_time: reboot
         job: "supervisord -c {{ project_path }}/etc/{{ site_name }}.supervisord.conf"
+
+    - name: Stop nginx
+      shell: sh -c "sudo service nginx stop"
+      when: inventory_hostname in groups['web']
 
     - name: Shut down supervisor.
       action: "shell supervisorctl -c etc/{{ site_name }}.supervisord.conf shutdown"
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
       ignore_errors: yes
 
     - name: Wait for supervisor to actually stop.
       wait_for:
-        path: {{ project_path }}/var/supervisord.pid
+        path: "{{ project_path }}/var/supervisord.pid"
         state: absent
 
     - name: Start site with supervisor.
       action: "shell supervisord -c etc/{{ site_name }}.supervisord.conf"
       args:
-        chdir: {{ project_path }}
+        chdir: "{{ project_path }}"
+
+    - name: Start nginx
+      shell: sh -c "sudo service nginx start"
+      when: inventory_hostname in groups['web']

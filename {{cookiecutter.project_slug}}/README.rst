@@ -6,57 +6,101 @@ Introduction
 Usage, etc.
 
 
-Development
+Local setup
 -----------
+
+These instructions assume that ``git``, ``docker``, and ``docker-compose`` are
+installed on your host machine. For server provisioning and deployment,
+``ansible`` is required as well.
 
 This project makes use of Pipenv. If you are new to pipenv, install it and
 study the output of ``pipenv --help``, especially the commands ``pipenv lock``
 and ``pipenv sync``. Or read the `docs <https://docs.pipenv.org/>`_.
 
-We like to keep the project virtual environment inside
-``{{ cookiecutter.project_slug }}/.venv``. This is not the default Pipenv
-behaviour, so we need to set the following environment variable:
-``export PIPENV_VENV_IN_PROJECT=1``. If you add that to your ``.bashrc``, you
-don't need to specify it each time.
+If this project depends on private packages, we will need to setup some authentication.
+We do this using a `Personal access token <https://github.com/settings/tokens>`_. Generate one and
+put it in your `$HOME/.netrc` file, as follows::
 
-Install the environment::
+    machine github.com
+    login <github username>
+    password <github token>
 
-    $ pipenv sync --dev
+    machine packages.lizard.net
+    login nens
+    password <packages.lizard.net password (check the internalpackages repo)>
+
+For security reasons, make it readable only by you::
+
+    $ chmod 600 ~/.netrc
+
+The docker-compose file expects the following folders to exist:
+
+ - ``~/.cache/pip``
+ - ``~/.cache/pipenv``
+
+Check if they exist and if you are the owner. If they do not exist, create them
+with ``mkdir``, and if they are not owned by you, use ``sudo chown``.
+
+Local development
+-----------------
+
+First, clone this repo and make some required directories::
+
+    $ git clone git@github.com:nens/{{ cookiecutter.project_slug }}.git
+    $ cd {{ cookiecutter.project_slug }}
     $ mkdir -p var/static var/media var/log
 
-As we want to avoid port clashes, you have to open a port from your host to
-the database inside your docker. You should specify "host:docker" port mappings
-in  a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``,
-as follows:
+Then build the docker image, providing your user and group ids for correct file
+permissions::
 
-.. code-block:: yaml
+    $ docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g` web
 
-    version: '3'
-    services:
+The entrypoint into the docker is set to `pipenv run`, so that every command is
+executed in the pipenv-managed virtual environment. On the first `docker-compose run`,
+the `.venv` folder will be created automatically inside your project directory::
 
-      db:
-        ports:
-          - "5435:5432"  # the first one should the one in the localsettings
+    $ docker-compose run --rm web bash
 
-Also, set the same port in your local django settings
-``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
+If you happened to have created the virtual environment while outside the
+docker, recreate it inside the docker. Optionally, add the `--site-packages` switch
+to be able to import python packages that you installed with apt inside the
+docker (e.g. mapnik)::
 
-.. code-block:: python
+    (docker) $ pipenv --python 3.6 [--site-packages]
 
-    DATABASES['default']['HOST'] = 'localhost'
-    DATABASES['default']['PORT'] = '5435'  # match this one with the docker-compose file
+Then install the packages (including dev packages) listed in `Pipfile.lock`::
 
-Start the database::
+    (docker) $ pipenv sync --dev
 
-    $ docker-compose up db
+Run migrations::
 
-Migrate the database::
+    (docker) $ python manage.py migrate
 
-    $ pipenv run python manage.py migrate
+Then exit the docker shell (Ctrl + D)
 
-Run the webserver using your favourite IDE, or from the commandline::
+At this point, you may want to test your installation::
 
-    $ pipenv run python manage.py runserver 0.0.0.0:5000
+    $ docker-compose run --rm web python manage.py test
+
+Or start working with {{ cookiecutter.project_slug }} right away::
+
+    $ docker-compose up
+
+Now that Django is up and running, you may want to access the website from the
+browser on your host machine. For this, you will need to open a port by generating
+a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``. Checkout
+``{{ cookiecutter.package_name }}/docker-compose.yml`` for an example.
+
+To stop all running containers without removing them, do this::
+
+    $ docker-compose stop
+
+To update package versions (taking into account constraints in ``Pipfile``)::
+
+    $ docker-compose run --rm web pipenv lock
+
+And commit the newly generated ``Pipfile.lock``. If you make any change to
+``Pipfile`` or ``setup.py``, you have to regenerate the lockfile.
 
 
 Installation on the server
@@ -64,67 +108,58 @@ Installation on the server
 
 The ansible config and playbook is in the ``ansible/``
 subdir. ``ansible/staging_inventory`` and ``ansible/production_inventory`` are
-the two inventory files. Adjust variables (like checkout name and server name)
+the two inventory files. Adjust variables (server name and gunicorn port)
 in there.
 
 The ``ansible/provision.yml`` playbook does the root-level stuff like
 installing debian packages and creating a ``/srv/*`` directory. You should
-only need to run this when there's a new debian dependency, for instance. It
+only need to run this when there is a new debian dependency. It
 also adds a couple of persons' ssh key to the ``~/.ssh/authorized_keys`` file
 of the buildout user, which the deploy script uses to log you in directly as
 user buildout.
 
 The ``ansible/deploy.yml`` playbook is for the regular releases including git
-checkout, bin/buildout, migration and supervisor restart.
+checkout, pipenv sync, migration, supervisor restart, and nginx restart.
 
-General usage::
+Deploy command::
 
-  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml
+  $ ansible-playbook -i ansible/staging_inventory ansible/deploy.yml --extra-vars "checkout_name=<version>"
 
-Only needed for the initial install or when the nginx config has been changed
-and so::
+If you don't have an ssh key set up, add ``-k`` to log in.
 
-  $ ansible-playbook -i ansible/staging_inventory ansible/provision.yml
+Provision command::
 
-If you don't have an ssh key set up, add ``-k`` to log in. ``-K`` asks for a
-sudo password if it isn't set up as passwordless.
+  $ ansible-playbook -K -i ansible/staging_inventory ansible/provision.yml
 
 
-Development with Docker
+Development outside the Docker
 -----------------------
 
-There's a docker file to make it easy for you to get started with the project
-and to run the tests. You can edit files in the current directory and they'll
-be picked up by docker right away.
+If you have the same OS on your local machine as used in the ``Dockerfile``, you
+may want to run your webserver outside a docker. You will need to install pipenv
+on your machine (note the pinning because of
+https://github.com/pypa/pipenv/issues/2666)::
 
-The docker setup is also used by ``Jenkinsfile``, which means that our jenkins
-instance will automatically pick it up.
+    $ pip install --upgrade setuptools
+    $ pip install pip==10.0.1 pipenv==2018.5.18
 
-As we want to avoid port clashes, you have to open a ports from your docker
-webserver to your host system. You should specify "host:docker" port mappings in
-a local ``{{ cookiecutter.package_name }}/docker-compose.override.yml``, as follows:
+Also, make sure you have the debian packages as specified in the ``Dockerfile``.
 
-.. code-block:: yaml
+Open up a port to the (still dockerized) db by adding a ``{{ cookiecutter.package_name }}/docker-compose.override.yml`` file.
+Checkout  ``{{ cookiecutter.package_name }}/docker-compose.yml`` for an example.
 
-    version: '3'
-    services:
+Also, setup the same port in your local django settings
+``{{ cookiecutter.package_name }}/localsettings.py``, as follows:
 
-      db:
-        ports:
-          - "5000:8000"  # pick your favourite port for access from your local browser
+.. code-block:: python
 
+    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES['default']['PORT'] = '5435'  # match this one with your docker-compose.override.yml
 
-First-time usage::
+Then run the following commands::
 
-    $ export UID  # or add this to your .bashrc
-    $ docker-compose build
-    $ docker-compose run --rm web pipenv install --deploy --dev
-    $ docker-compose run --rm web pipenv run python manage.py migrate
-    $ docker-compose up
-
-The site will now run on http://localhost:5000 (or whatever port you picked)
-
-Running the tests::
-
-    $ docker-compose run --rm web pipenv run python manage.py test
-
+    $ PIPENV_VENV_IN_PROJECT=1 pipenv --three
+    $ pipenv sync --dev
+    $ docker-compose up db
+    $ pipenv run python manage.py migrate
+    $ pipenv run python manage.py runserver 0.0.0.0:5000

@@ -11,7 +11,12 @@ install_requires = [
     'Django',
     'gunicorn',
     'raven',  # for sentry logging
+    'psycopg2',  # the postgres backend
     'python-memcached',  # for the django memcached backend
+    {% if cookiecutter.celery == "yes" %}
+    'celery',
+    'django-celery-results',  # for handling celery tasks on the web server
+    {% endif %}
     ]
 
 tests_require = [

@@ -7,7 +7,7 @@ DATABASES = {
     'default': {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'USER': '{{ cookiecutter.package_name }}',
+        'USER': 'todo.dbuser',
         'PASSWORD': 'todo.dbpassword',
         'HOST': 'todo.dbhost',
         'PORT': '5432',

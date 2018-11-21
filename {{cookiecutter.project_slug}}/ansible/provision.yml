@@ -7,16 +7,26 @@
   become: yes
   tasks:
 
-    - name: Add user "buildout" and set an unusable password.
+    - name: Add build user "{{ build_user }}" and set an unusable password.
       user:
-        name: buildout
+        name: "{{ build_user }}"
         password: '*'
         state: present
         shell: "/bin/bash"
+        groups: ''  # ensuring buildout is not a member of the sudo group
+        append: no  # append=yes would make groups='' ineffective
 
-    - name: "Add maintainers' ssh keys so they can log in as user buildout."
+    - name: Grant "{{ build_user }}" permission to reload nginx
+      lineinfile:
+        path: /etc/sudoers.d/buildout
+        line: "buildout ALL= NOPASSWD: /usr/sbin/service nginx *"
+        validate: /usr/sbin/visudo -cqf %s
+        create: yes
+        mode: 0440
+
+    - name: "Add maintainers' ssh keys so they can log in as the build user."
       authorized_key:
-        user: buildout
+        user: "{{ build_user }}"
         key: https://github.com/{{ item }}.keys
       with_items:
         - byrman
@@ -32,44 +42,56 @@
         - supervisor
         - memcached
         - nginx
+        - logrotate
         - libpq-dev       # for psycopg2 (postgres backend)
-        # - libgdal-dev   # if you need pygdal
-        # - gdal-bin      # if you need gdal command line
-        # - python-gdal   # if you need gdal command line python scripts
+        # - libgdal-dev \       uncomment if the project requires pygdal
+        # - libfreetype6-dev \  uncomment if the project requires matplotlib
 
-    - name: Upgrade setuptools, pip, and pipenv.
-      pip: name={{ item }} extra_args="--upgrade"
-      with_items:
-        - setuptools
-        - pip
-        - pipenv
+    - name: Upgrade setuptools
+      pip:
+        name: setuptools
+        state: latest
 
-    - name: Create dir inside /srv for the checkout.
+    - name: Install pip
+      pip:
+        name: pip
+        state: latest
+
+    - name: Install pipenv
+      pip:
+        name: pipenv
+        version: latest
+
+    - name: Create the project path.
       file:
-        path: {{ project_path }}
+        path: "{{ project_path }}"
         state: directory
         mode: 0755
-        owner: buildout
-        group: buildout
+        owner: "{{ build_user }}"
+        group: "{{ build_user }}"
 
-    - name: "Look if nginx config already exists (you'll need to run deploy first!)"
+    - name: Check whether nginx config exists
       stat: path={{ project_path }}/etc/{{ site_name }}.nginx.conf
       register: nginx_conffile
 
-    - name: Symlink nginx config, when available.
+    - name: Symlink and enable nginx config, when available.
       file:
-        src: {{ project_path }}/etc/{{ site_name }}.nginx.conf
-        dest: /etc/nginx/sites-available/{{ site_name }}.nginx.conf
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         state: link
+        force: yes
+      with_items:
+      - { src: "{{ project_path }}/etc/{{ site_name }}.nginx.conf" , dest: "/etc/nginx/sites-available/{{ site_name }}.nginx.conf" }
+      - { src: "/etc/nginx/sites-available/{{ site_name }}.nginx.conf", dest: "/etc/nginx/sites-enabled/{{ site_name }}.nginx.conf" }
       when: nginx_conffile.stat.exists
 
-    - name: Enable nginx config, when available.
-      file:
-        src: /etc/nginx/sites-available/{{ site_name }}.nginx.conf
-        dest: /etc/nginx/sites-enabled/{{ site_name }}.nginx.conf
-        state: link
-      when: nginx_conffile.stat.exists
-
-    - name: Restart nginx.
-      service: name=nginx state=reloaded
+    # logrotate does not pickup symlinks; we have to supply the config as root
+    - name: Configure logrotate
+      become: yes
+      template:
+        src: "templates/logrotate.j2"
+        dest: "/etc/logrotate.d/{{ site_name }}"
+        owner: root  # user, group and mode are required by logrotate
+        group: root
+        mode: 0644
       when: nginx_conffile.stat.exists

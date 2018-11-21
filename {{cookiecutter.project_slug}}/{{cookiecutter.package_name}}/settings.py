@@ -90,9 +90,9 @@ DATABASES = {
     'default': {
         'NAME': '{{ cookiecutter.package_name }}',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'USER': '{{ cookiecutter.package_name }}',
+        'USER': 'todo.dbuser',
         'PASSWORD': 'todo.dbpassword',
-        'HOST': 'todo.dbhost',
+        'HOST': 'todo.dbport',
         'PORT': '5432',
         }
     }
@@ -140,7 +140,7 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static_media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'i@mq5&hw$tw*=+)u$&i62mflg80=q%s#fr@$exb0jfo@(lg%to'
+SECRET_KEY = # TODO add a random string here
 
 ROOT_URLCONF = '{{ cookiecutter.package_name }}.urls'
 
@@ -195,6 +195,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'gunicorn',
 )
+
+{% if cookiecutter.celery == "yes" %}
+CELERY_RESULT_BACKEND = 'django-db'
+
+INSTALLED_APPS += (
+    'django_celery_results',
+)
+{% endif %}
 
 # TODO: Put your real url here to configure Sentry.
 # RAVEN_CONFIG = {
