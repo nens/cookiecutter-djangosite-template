@@ -5,6 +5,9 @@ Changelog for cookiecutter-djangosite-template
 1.3 (unreleased)
 ----------------
 
+- Set timezone to Europe/Amsterdam within Docker for consistency with our
+  servers.
+
 - Create the 'buildout' user with an unusable password. The name 'buildout'
   is for historical reasons and does not refer to the package manager used.
 
