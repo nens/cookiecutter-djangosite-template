@@ -10,6 +10,16 @@ Changelog for cookiecutter-djangosite-template
 
 - Replaced buildout with pipenv as package manager.
 
+- Updated Ubuntu version to 18 (and python to 3.6).
+
+- Replaced Pep8 checking by Flake8 checking.
+
+- Added the option to add celery.
+
+- Generate a random SECRET_KEY.
+
+- Enabled deployment without root privileges.
+
 
 1.2 (2018-02-09)
 ----------------
