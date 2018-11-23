@@ -34,10 +34,16 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     python3-pip \
     locales \
+    tzdata \
 && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+# Set timezone to the same as our servers, Europe/Amsterdam
+# Needs tzdata installed
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN pip3 install --upgrade setuptools pip pipenv
 
